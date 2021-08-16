@@ -1,0 +1,4 @@
+filename	file_type	species_scientific_name	genome_assembly_name	genome_assembly_accession	genome_annotation_name	is_raw_counts	library_preparation_protocol	units	biosample_input_type	modality
+internal_nonsmokerslung.expression.txt	Expression Matrix	Homo sapiens								
+internal_nonsmokerslung.meta.txt	Metadata									
+internal_nonsmokerslung.UMAP.txt	Cluster									

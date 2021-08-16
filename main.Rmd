@@ -1,0 +1,60 @@
+---
+title: Analysis of smoking status impact on molecular mechanisms of SARS -CoV-2 viral
+  entry through single-cell sequencing experiments.
+author: "Mateusz Urbanek"
+date: "8/16/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+list_of_packages <- c("ggplot2", "data.table")
+new_packages <- list_of_packages[!(list_of_packages %in% installed.packages()[, "Package"])]
+if(length(new_packages)>0) install.packages(new.packages)
+
+config.THREADS <- 32
+```
+
+# Data
+
+```{r Loading data from files, message=TRUE, warning=TRUE}
+smokers.file.supp = 'Data/Smokers/file_supplemental_info.tsv'
+smokers.file.expr = 'Data/Smokers/expression/internal_smokerslung.expression.txt'
+smokers.file.meta = 'Data/Smokers/metadata/internal_smokerslung.meta.txt'
+
+non_smokers.file.supp = 'Data/NonSmokers/file_supplemental_info.tsv'
+non_smokers.file.expr = 'Data/NonSmokers/expression/internal_nonsmokerslung.expression.txt'
+non_smokers.file.meta = 'Data/NonSmokers/metadata/internal_nonsmokerslung.meta.txt'
+
+library(data.table)
+options(datatable.fread.datatable=FALSE)
+setDTthreads(config.THREADS)
+
+# Smokers
+
+smokers.data.supp <- fread(smokers.file.supp, header = TRUE, sep = "\t", dec = ".")
+head(smokers.data.supp)
+
+tmp <- fread(smokers.file.expr, header = TRUE, sep = "\t", dec = ".")
+smokers.data.expr <- tmp[,-1]
+rownames(smokers.data.expr) <- tmp[,1]
+smokers.data.expr <- as.data.frame(t(smokers.data.expr))
+head(smokers.data.expr)
+
+smokers.data.meta <- fread(smokers.file.meta, header = TRUE, sep = "\t", dec = ".")
+head(smokers.data.meta)
+
+# Non Smokers
+
+non_smokers.data.supp <- fread(non_smokers.file.supp, header = TRUE, sep = "\t", dec = ".")
+head(non_smokers.data.supp)
+
+non_smokers.data.expr <- fread(non_smokers.file.expr, header = TRUE, sep = "\t", dec = ".")
+non_smokers.data.expr <- tmp[,-1]
+rownames(non_smokers.data.expr) <- tmp[,1]
+non_smokers.data.expr <- as.data.frame(t(non_smokers.data.expr))
+head(non_smokers.data.expr)
+
+non_smokers.data.meta <- fread(non_smokers.file.meta, header = TRUE, sep = "\t", dec = ".")
+head(non_smokers.data.meta)
+```
+
