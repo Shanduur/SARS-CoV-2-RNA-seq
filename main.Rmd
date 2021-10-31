@@ -79,3 +79,21 @@ rownames(non_smokers.data.meta) <- non_smokers.data.meta[,1]
 non_smokers.data.meta <- non_smokers.data.meta[,-c(1)]
 head(non_smokers.data.meta)
 ```
+
+## Calculate average expressions for each gene in each population
+
+```{r smokers avg expression, message=TRUE, warning=TRUE}
+smokers.data.expr.avg <- as.data.frame(colMeans(smokers.data.expr_t))
+colnames(smokers.data.expr.avg) <- c("average")
+smokers.data.expr.avg
+```
+
+```{r non_smokers avg expression, message=TRUE, warning=TRUE}
+non_smokers.data.expr.avg <- as.data.frame(colMeans(non_smokers.data.expr_t))
+colnames(non_smokers.data.expr.avg) <- c("average")
+non_smokers.data.expr.avg
+```
+
+```{r compare averages, message=TRUE, warning=TRUE}
+non_smokers.data.expr.avg - smokers.data.expr.avg
+```
