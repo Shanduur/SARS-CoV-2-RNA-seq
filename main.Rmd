@@ -13,8 +13,6 @@ if (!require("ggplot2")) { install.packages("ggplot2") }
 if (!require("data.table")) { install.packages("data.table") }
 # requires libcurl_dev
 if (!require("tidyverse")) { install.packages("tidyverse") }
-
-config.THREADS <- 32
 ```
 
 # Data
@@ -31,7 +29,7 @@ non_smokers.file.meta = 'Data/NonSmokers/metadata/internal_nonsmokerslung.meta.t
 library(glue)
 library(data.table)
 options(datatable.fread.datatable=FALSE)
-setDTthreads(config.THREADS)
+library(tidyverse)
 ```
 
 ## Load smokers data
@@ -44,13 +42,17 @@ tmp <- fread(smokers.file.expr, header = TRUE, sep = "\t", dec = ".")
 smokers.data.expr_t <- tmp[,-1]
 rownames(smokers.data.expr_t) <- tmp[,1]
 smokers.data.expr_t <- as.data.frame(t(smokers.data.expr_t))
-names(smokers.data.expr_t) <- glue::glue("col_{names(smokers.data.expr_t)}")
+head(smokers.data.expr_t)
 
 smokers.data.expr <- fread(smokers.file.expr, header = TRUE, sep = "\t", dec = ".")
-names(smokers.data.expr) <- glue::glue("col_{names(smokers.data.expr)}")
+rownames(smokers.data.expr) <- smokers.data.expr[,1]
+smokers.data.expr <- smokers.data.expr[,-c(1)]
 head(smokers.data.expr)
 
 smokers.data.meta <- fread(smokers.file.meta, header = TRUE, sep = "\t", dec = ".")
+smokers.data.meta <- smokers.data.meta[-c(1),]
+rownames(smokers.data.meta) <- smokers.data.meta[,1]
+smokers.data.meta <- smokers.data.meta[,-c(1)]
 head(smokers.data.meta)
 ```
 
@@ -64,30 +66,16 @@ tmp <- fread(non_smokers.file.expr, header = TRUE, sep = "\t", dec = ".")
 non_smokers.data.expr_t <- tmp[,-1]
 rownames(non_smokers.data.expr_t) <- tmp[,1]
 non_smokers.data.expr_t <- as.data.frame(t(non_smokers.data.expr_t))
-names(non_smokers.data.expr_t) <- glue::glue("col_{names(non_smokers.data.expr_t)}")
+head(non_smokers.data.expr_t)
 
 non_smokers.data.expr <- fread(non_smokers.file.expr, header = TRUE, sep = "\t", dec = ".")
-names(non_smokers.data.expr) <- glue::glue("col_{names(non_smokers.data.expr)}")
+rownames(non_smokers.data.expr) <- non_smokers.data.expr[,1]
+non_smokers.data.expr <- non_smokers.data.expr[,-c(1)]
 head(non_smokers.data.expr)
 
 non_smokers.data.meta <- fread(non_smokers.file.meta, header = TRUE, sep = "\t", dec = ".")
+non_smokers.data.meta <- non_smokers.data.meta[-c(1),]
+rownames(non_smokers.data.meta) <- non_smokers.data.meta[,1]
+non_smokers.data.meta <- non_smokers.data.meta[,-c(1)]
 head(non_smokers.data.meta)
 ```
-
-# Basic graphs
-
-```{r Graphing library, message=TRUE, warning=TRUE}
-library(ggplot2)
-library(tidyverse)
-
-smokers.data.expr %>% tidyr::gather("id", "value", 2:ncol(smokers.data.expr)) %>% 
-  ggplot(., aes(x=col_V1, y=value)) +
-  geom_point() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) 
-
-non_smokers.data.expr %>% tidyr::gather("id", "value", 2:ncol(non_smokers.data.expr)) %>% 
-  ggplot(., aes(x=col_V1, y=value)) +
-  geom_point() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-```
-
