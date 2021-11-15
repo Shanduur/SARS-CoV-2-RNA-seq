@@ -6,7 +6,7 @@ date: "8/16/2021"
 output: pdf_document
 ---
 
-```{r setup, message=TRUE, warning=TRUE}
+```{r setup, message=FALSE, warning=FALSE}
 # package used for plotting
 if (!require("ggplot2")) { install.packages("ggplot2") }
 
@@ -15,6 +15,12 @@ if (!require("data.table")) { install.packages("data.table") }
 
 # requires libcurl_dev
 if (!require("tidyverse")) { install.packages("tidyverse") }
+
+if (!require("geometry")) { install.packages("geometry") }
+
+if (!require("foreach")) { install.packages("foreach") }
+if (!require("parallel")) { install.packages("parallel") }
+if (!require("doParallel")) { install.packages("doParallel") }
 
 if (!require("BiocManager")) { 
   install.packages("BiocManager")
@@ -47,11 +53,11 @@ library(tidyverse)
 smokers.data.supp <- fread(smokers.file.supp, header = TRUE, sep = "\t", dec = ".")
 head(smokers.data.supp)
 
-tmp <- fread(smokers.file.expr, header = TRUE, sep = "\t", dec = ".")
-smokers.data.expr_t <- tmp[,-1]
-rownames(smokers.data.expr_t) <- tmp[,1]
-smokers.data.expr_t <- as.data.frame(t(smokers.data.expr_t))
-head(smokers.data.expr_t)
+# tmp <- fread(smokers.file.expr, header = TRUE, sep = "\t", dec = ".")
+# smokers.data.expr_t <- tmp[,-1]
+# rownames(smokers.data.expr_t) <- tmp[,1]
+# smokers.data.expr_t <- as.data.frame(t(smokers.data.expr_t))
+# head(smokers.data.expr_t)
 
 smokers.data.expr <- fread(smokers.file.expr, header = TRUE, sep = "\t", dec = ".")
 rownames(smokers.data.expr) <- smokers.data.expr[,1]
@@ -71,11 +77,11 @@ head(smokers.data.meta)
 non_smokers.data.supp <- fread(non_smokers.file.supp, header = TRUE, sep = "\t", dec = ".")
 head(non_smokers.data.supp)
 
-tmp <- fread(non_smokers.file.expr, header = TRUE, sep = "\t", dec = ".")
-non_smokers.data.expr_t <- tmp[,-1]
-rownames(non_smokers.data.expr_t) <- tmp[,1]
-non_smokers.data.expr_t <- as.data.frame(t(non_smokers.data.expr_t))
-head(non_smokers.data.expr_t)
+# tmp <- fread(non_smokers.file.expr, header = TRUE, sep = "\t", dec = ".")
+# non_smokers.data.expr_t <- tmp[,-1]
+# rownames(non_smokers.data.expr_t) <- tmp[,1]
+# non_smokers.data.expr_t <- as.data.frame(t(non_smokers.data.expr_t))
+# head(non_smokers.data.expr_t)
 
 non_smokers.data.expr <- fread(non_smokers.file.expr, header = TRUE, sep = "\t", dec = ".")
 rownames(non_smokers.data.expr) <- non_smokers.data.expr[,1]
@@ -92,19 +98,112 @@ head(non_smokers.data.meta)
 ## Calculate average expressions for each gene in each population
 
 ```{r smokers avg expression, message=TRUE, warning=TRUE}
-smokers.data.expr.avg <- as.data.frame(colMeans(smokers.data.expr_t))
+smokers.data.expr.avg <- as.data.frame(rowMeans(smokers.data.expr))
 colnames(smokers.data.expr.avg) <- c("average")
 smokers.data.expr.avg
 ```
 
 ```{r non_smokers avg expression, message=TRUE, warning=TRUE}
-non_smokers.data.expr.avg <- as.data.frame(colMeans(non_smokers.data.expr_t))
+non_smokers.data.expr.avg <- as.data.frame(rowMeans(non_smokers.data.expr))
 colnames(non_smokers.data.expr.avg) <- c("average")
 non_smokers.data.expr.avg
 ```
 
 ```{r compare averages, message=TRUE, warning=TRUE}
 non_smokers.data.expr.avg - smokers.data.expr.avg
+```
+## Calculating angles between vectors
+
+```{r function for calculating distance, message=TRUE, warning=TRUE}
+library(geometry)
+library(foreach)
+library(parallel)
+library(doParallel)
+registerDoParallel(cores=detectCores())
+
+angle <- function(vec_a, vec_b) {
+  dot.prod = dot(vec_a, vec_b)
+  norm.a = sqrt(sum(vec_a * vec_a))
+  norm.b = sqrt(sum(vec_b * vec_b))
+
+  theta = acos( dot.prod / ( norm.a * norm.b ) )
+  return(theta)
+}
+```
+
+```{r smokers row-wise vectors, message=TRUE, warning=TRUE}
+c <- nrow(smokers.data.expr)
+smokers.angles <- matrix(ncol = 3, nrow = 0)
+colnames(smokers.angles) <- c('vec_a', 'vec_b', 'angle')
+
+calc <- function(i, c) {
+  results <- matrix(ncol = 3, nrow = c)
+
+  for (j in 1:c) {
+    results[j, 1] = rownames(smokers.data.expr)[i]
+    results[j, 2] = rownames(smokers.data.expr)[j]
+    results[j, 3] = angle(as.double(smokers.data.expr[i,]), as.double(smokers.data.expr[j,]))
+  }
+  
+  return(results)
+}
+
+results <- foreach(i = 1:c) %dopar% {
+  calc(i, c)
+}
+
+for (i in 1:length(results)) {
+  smokers.angles = rbind(
+    smokers.angles,
+    matrix(results[i][[1]], ncol = 3)
+  )
+}
+
+smokers.angles = data.frame(smokers.angles)
+smokers.angles$angle = as.double(smokers.angles$angle)
+smokers.angles$angle[is.na(smokers.angles$angle)] <- 0
+
+smokers.angles
+
+non_smokers.angles[smokers.angles$vec_a == smokers.angles$vec_b,]
+```
+
+```{r non-smokers row-wise vectors, message=TRUE, warning=TRUE}
+c <- nrow(smokers.data.expr)
+non_smokers.angles <- matrix(ncol = 3, nrow = 0)
+colnames(non_smokers.angles) <- c('vec_a', 'vec_b', 'angle')
+
+
+calc <- function(i, c) {
+  results <- matrix(ncol = 3, nrow = c)
+
+  for (j in 1:c) {
+    results[j, 1] = rownames(non_smokers.data.expr)[i]
+    results[j, 2] = rownames(non_smokers.data.expr)[j]
+    results[j, 3] = angle(as.double(non_smokers.data.expr[i,]), as.double(non_smokers.data.expr[j,]))
+  }
+  
+  return(results)
+}
+
+results <- foreach(i = 1:c) %dopar% {
+  calc(i, c)
+}
+
+for (i in 1:length(results)) {
+  non_smokers.angles = rbind(
+    non_smokers.angles,
+    results[i][[1]]
+  )
+}
+
+non_smokers.angles = data.frame(non_smokers.angles)
+non_smokers.angles$angle = as.double(non_smokers.angles$angle)
+non_smokers.angles$angle[is.na(non_smokers.angles$angle)] <- 0
+
+non_smokers.angles
+
+non_smokers.angles[non_smokers.angles$vec_a == non_smokers.angles$vec_b,]
 ```
 
 ## Building a SCE object 
