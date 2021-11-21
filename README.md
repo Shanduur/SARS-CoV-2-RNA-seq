@@ -4,6 +4,19 @@
 
 Repository containg Master's Thesis source and data.
 
+# Dataset
+
+## How dataset was prepared?
+
+Based on the notebooks and publication, we can deduce that:
+1. Multiple dataset were gathered;
+2. Divided to **smoking** if `stat` was in [`current`, `smoked`, `active`, `former`, `heavy`, `light`], **nonsmoking** and **NaN**;
+3. Dropped **NaN**;
+
+## On what genes the analysis focused?
+
+The surface receptor angiotensin-converting enzyme 2 (ACE2) and the associated proteases, transmembrane protease serine 2 (TMPRSS2) and Cathepsin L (CTSL), were previously identified mediators of SARS-CoV cellular entry. In the [original publication][pub-org] single-cell RNA-seq (scRNA-seq) across diverse tissues to assess the cell-type-specific expression of ACE2, TMPRSS2, and CTSL. Specific subsets of respiratory epithelial cells were identified as putative targets of viral infection, including subsets of epithelial cells in the nasal passages, lung and airways. Additionally, they detected expression in other tissues that may serve as routes of viral transmission, including the gut and corneal epithelia, and in cells potentially associated with COVID-19 clinical pathology including cardiomyocytes, olfactory sustentacular cells, and renal epithelial cells.
+
 # Resources for COVID Smokers data
 
 ## Videos

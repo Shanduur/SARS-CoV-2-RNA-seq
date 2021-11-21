@@ -112,6 +112,7 @@ non_smokers.data.expr.avg
 ```{r compare averages, message=TRUE, warning=TRUE}
 non_smokers.data.expr.avg - smokers.data.expr.avg
 ```
+
 ## Calculating angles between vectors
 
 ```{r function for calculating distance, message=TRUE, warning=TRUE}
@@ -206,6 +207,25 @@ non_smokers.angles
 non_smokers.angles[non_smokers.angles$vec_a == non_smokers.angles$vec_b,]
 ```
 
+```{r aggregate and grapph angles, message=TRUE, warning=TRUE}
+library("ggplot2")
+
+smokers.angles$type = "smokers"
+smokers.angles$type = factor(smokers.angles$type)
+
+non_smokers.angles$type = "non smokers"
+non_smokers.angles$type = factor(non_smokers.angles$type)
+
+all.angles = rbind(non_smokers.angles, smokers.angles)
+all.angles = all.angles[all.angles$vec_a != all.angles$vec_b,]
+
+plt.angles <- ggplot(all.angles, aes(x=vec_b, y=vec_a, fill=angle)) +
+  geom_tile() +
+  scale_fill_gradient(low="blue", high="yellow") +
+  theme(axis.text.x = element_text(angle = 270))
+plt.angles
+```
+
 ## Building a SCE object 
 
 ```{r SCE, message=TRUE, warning=TRUE}
@@ -216,7 +236,7 @@ library("SingleCellExperiment")
 # smokers.data.expr_t$type = factor("smokers")
 # smokers.data.meta$type = factor("smokers")
 
-all.data.expr_t = rbind(non_smokers.data.expr_t, smokers.data.expr_t)
+# all.data.expr_t = rbind(non_smokers.data.expr_t, smokers.data.expr_t)
 all.data.expr = cbind(non_smokers.data.expr, smokers.data.expr)
 all.data.meta = rbind(non_smokers.data.meta, smokers.data.meta)
 
@@ -228,11 +248,10 @@ scset <- SingleCellExperiment(
 scset
 ```
 
-## Cleaning the Expression Matrix
+## Working with the Expression Matrix
 
 ```{r expression QC, message=TRUE, warning=TRUE}
 library("scater")
-library("ggplot2")
 
 scset.metrics.cell <- perCellQCMetrics(
   scset
