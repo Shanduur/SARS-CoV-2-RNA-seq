@@ -6,6 +6,12 @@ Repository containg Master's Thesis source and data.
 
 # Dataset
 
+## Source
+
+The data that is located in `Data/` directory, is downloaded from [singlecell.broadinstitute.org][sc-broadinstitute]:
+- [HCA LungMAP COVID-19 Smokers Lung (277k+ cells, genes)][data-smokers]
+- [HCA LungMAP COVID-19 Internal Non-Smokers Lung (96k+ cells, 27 genes)][data-nonsmokers]
+
 ## How dataset was prepared?
 
 Based on the notebooks and publication, we can deduce that:
@@ -38,9 +44,12 @@ The surface receptor angiotensin-converting enzyme 2 (ACE2) and the associated p
 
 <!-- Resources -->
 
-[pub-org]: https://www.biorxiv.org/content/10.1101/2020.04.19.049254v1
-[pub-sc-rna]: https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-017-0467-4
+[data-smokers]: https://singlecell.broadinstitute.org/single_cell/study/SCP876/hca-lungmap-covid-19-smokers-lung?scpbr=hca-covid-19-integrated-analysis
+[data-nonsmokers]: https://singlecell.broadinstitute.org/single_cell/study/SCP875/hca-lungmap-covid-19-internal-nonsmokers-lung?scpbr=hca-covid-19-integrated-analysis
 [intro-sc-rna-seq]: https://scrnaseq-course.cog.sanger.ac.uk/website/introduction-to-single-cell-rna-seq.html
+[sc-broadinstitute]: https://singlecell.broadinstitute.org/
+[pub-org]: https://www.biorxiv.org/content/10.1101/2020.04.19.049254v2
+[pub-sc-rna]: https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-017-0467-4
 [yt-statquest-rna-seq]: https://www.youtube.com/watch?v=tlf6wYJrwKY
 [yt-chow-sc-seq]: https://www.youtube.com/watch?v=k9VFNLLQP8c
 [yt-rna-seq-lst]: https://www.youtube.com/playlist?list=PLjiXAZO27elC_xnk7gVNM85I2IQl5BEJN

@@ -1,0 +1,22 @@
+Subject: Question concerning HCA LungMAP COVID-19 (Smokers-NonSmokers)
+From: Mateusz Urbanek <mateurb418@student.polsl.pl>
+To: muus@broadinstitute.org
+
+Dear Sir,
+
+I am a Master's Degree student of Data Science at the Silesian University of Technology. Currently, I am working on my Master's Thesis titled "Analysis of smoking status impact on molecular mechanisms of SARS-CoV-2 viral entry through single-cell sequencing experiments". My Supervisor, Ph.D. Anna Papież suggested reading the publication as a base, from which I should start my research. ("Integrated analyses of single-cell atlases reveal age, gender, and smoking status associations with cell type-specific expression of mediators of SARS-CoV-2 viral entry and highlights inflammatory programs in putative target cells")
+
+I read the publication and then downloaded the data ("HCA LungMAP COVID-19 Smokers/Nonsmokers Lung") from singlecell.broadinstitute.org. Both Smokers and Nonsmokers datasets consist of only 27 genes within over 373 thousand cells. After contacting my supervisor with a question about the data - especially a small number of the genes, she suggested that I should contact you. 
+
+Going through the Article, I was unable to find any information about the gene selection process. Here emerges my main question - how did you select those 27 genes as a base for further research? 
+
+Additionally, I have another question loosely connected with the previous. Is there any possibility to obtain the smokers/nonsmokers lung datasets in raw format without preprocessing applied?
+
+Thank you for your time. I am looking forward to your reply.
+
+Yours sincerely
+
+    Mateusz Urbanek
+    Master's in Data Science student at Silesian University of Technology
+    mateurb418@student.polsl.pl
+    +48720783126
