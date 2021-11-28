@@ -34,12 +34,12 @@ BiocManager::install(c("SingleCellExperiment", "scater"))
 
 ```{r Loading data from files, message=TRUE, warning=TRUE}
 smokers.file.supp = 'Data/Smokers/file_supplemental_info.tsv'
-smokers.file.expr = 'Data/Smokers/expression/internal_smokerslung.expression.txt'
-smokers.file.meta = 'Data/Smokers/metadata/internal_smokerslung.meta.txt'
+smokers.file.expr = 'Data/Smokers/internal_smokerslung.expression.txt'
+smokers.file.meta = 'Data/Smokers/internal_smokerslung.meta.txt'
 
 non_smokers.file.supp = 'Data/NonSmokers/file_supplemental_info.tsv'
-non_smokers.file.expr = 'Data/NonSmokers/expression/internal_nonsmokerslung.expression.txt'
-non_smokers.file.meta = 'Data/NonSmokers/metadata/internal_nonsmokerslung.meta.txt'
+non_smokers.file.expr = 'Data/NonSmokers/internal_nonsmokerslung.expression.txt'
+non_smokers.file.meta = 'Data/NonSmokers/internal_nonsmokerslung.meta.txt'
 
 library(glue)
 library(data.table)
