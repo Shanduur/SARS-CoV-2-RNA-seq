@@ -1,0 +1,271 @@
+---
+title: Analysis of smoking status impact on molecular mechanisms of SARS -CoV-2 viral
+  entry through single-cell sequencing experiments.
+author: "Mateusz Urbanek"
+date: "8/16/2021"
+output: pdf_document
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+# package used for plotting
+if (!require("ggplot2")) { install.packages("ggplot2") }
+
+# package used for loading big data sets
+if (!require("data.table")) { install.packages("data.table") }
+
+# requires libcurl_dev
+if (!require("tidyverse")) { install.packages("tidyverse") }
+
+if (!require("geometry")) { install.packages("geometry") }
+
+if (!require("foreach")) { install.packages("foreach") }
+if (!require("parallel")) { install.packages("parallel") }
+if (!require("doParallel")) { install.packages("doParallel") }
+
+if (!require("BiocManager")) { 
+  install.packages("BiocManager")
+  BiocManager::install()  
+}
+
+BiocManager::install(c("SingleCellExperiment", "scater"))
+```
+
+# Data
+
+```{r Loading data from files, message=TRUE, warning=TRUE}
+smokers.file.supp = 'Data/Smokers/file_supplemental_info.tsv'
+smokers.file.expr = 'Data/Smokers/internal_smokerslung.expression.txt'
+smokers.file.meta = 'Data/Smokers/internal_smokerslung.meta.txt'
+
+non_smokers.file.supp = 'Data/NonSmokers/file_supplemental_info.tsv'
+non_smokers.file.expr = 'Data/NonSmokers/internal_nonsmokerslung.expression.txt'
+non_smokers.file.meta = 'Data/NonSmokers/internal_nonsmokerslung.meta.txt'
+
+library(glue)
+library(data.table)
+options(datatable.fread.datatable=FALSE)
+library(tidyverse)
+```
+
+## Load smokers data
+
+```{r Smokers Data, message=TRUE, warning=TRUE}
+smokers.data.supp <- fread(smokers.file.supp, header = TRUE, sep = "\t", dec = ".")
+head(smokers.data.supp)
+
+# tmp <- fread(smokers.file.expr, header = TRUE, sep = "\t", dec = ".")
+# smokers.data.expr_t <- tmp[,-1]
+# rownames(smokers.data.expr_t) <- tmp[,1]
+# smokers.data.expr_t <- as.data.frame(t(smokers.data.expr_t))
+# head(smokers.data.expr_t)
+
+smokers.data.expr <- fread(smokers.file.expr, header = TRUE, sep = "\t", dec = ".")
+rownames(smokers.data.expr) <- smokers.data.expr[,1]
+smokers.data.expr <- smokers.data.expr[,-c(1)]
+head(smokers.data.expr)
+
+smokers.data.meta <- fread(smokers.file.meta, header = TRUE, sep = "\t", dec = ".")
+smokers.data.meta <- smokers.data.meta[-c(1),]
+rownames(smokers.data.meta) <- smokers.data.meta[,1]
+smokers.data.meta <- smokers.data.meta[,-c(1)]
+head(smokers.data.meta)
+```
+
+## Load non-smokers data
+
+```{r Non-smokers Data, message=TRUE, warning=TRUE}
+non_smokers.data.supp <- fread(non_smokers.file.supp, header = TRUE, sep = "\t", dec = ".")
+head(non_smokers.data.supp)
+
+# tmp <- fread(non_smokers.file.expr, header = TRUE, sep = "\t", dec = ".")
+# non_smokers.data.expr_t <- tmp[,-1]
+# rownames(non_smokers.data.expr_t) <- tmp[,1]
+# non_smokers.data.expr_t <- as.data.frame(t(non_smokers.data.expr_t))
+# head(non_smokers.data.expr_t)
+
+non_smokers.data.expr <- fread(non_smokers.file.expr, header = TRUE, sep = "\t", dec = ".")
+rownames(non_smokers.data.expr) <- non_smokers.data.expr[,1]
+non_smokers.data.expr <- non_smokers.data.expr[,-c(1)]
+head(non_smokers.data.expr)
+
+non_smokers.data.meta <- fread(non_smokers.file.meta, header = TRUE, sep = "\t", dec = ".")
+non_smokers.data.meta <- non_smokers.data.meta[-c(1),]
+rownames(non_smokers.data.meta) <- non_smokers.data.meta[,1]
+non_smokers.data.meta <- non_smokers.data.meta[,-c(1)]
+head(non_smokers.data.meta)
+```
+
+## Calculate average expressions for each gene in each population
+
+```{r smokers avg expression, message=TRUE, warning=TRUE}
+smokers.data.expr.avg <- as.data.frame(rowMeans(smokers.data.expr))
+colnames(smokers.data.expr.avg) <- c("average")
+smokers.data.expr.avg
+```
+
+```{r non_smokers avg expression, message=TRUE, warning=TRUE}
+non_smokers.data.expr.avg <- as.data.frame(rowMeans(non_smokers.data.expr))
+colnames(non_smokers.data.expr.avg) <- c("average")
+non_smokers.data.expr.avg
+```
+
+```{r compare averages, message=TRUE, warning=TRUE}
+non_smokers.data.expr.avg - smokers.data.expr.avg
+```
+
+## Calculating angles between vectors
+
+```{r function for calculating distance, message=TRUE, warning=TRUE}
+library(geometry)
+library(foreach)
+library(parallel)
+library(doParallel)
+registerDoParallel(cores=detectCores())
+
+angle <- function(vec_a, vec_b) {
+  dot.prod = dot(vec_a, vec_b)
+  norm.a = sqrt(sum(vec_a * vec_a))
+  norm.b = sqrt(sum(vec_b * vec_b))
+
+  theta = acos( dot.prod / ( norm.a * norm.b ) )
+  return(theta)
+}
+```
+
+```{r smokers row-wise vectors, message=TRUE, warning=TRUE}
+c <- nrow(smokers.data.expr)
+smokers.angles <- matrix(ncol = 3, nrow = 0)
+colnames(smokers.angles) <- c('vec_a', 'vec_b', 'angle')
+
+calc <- function(i, c) {
+  results <- matrix(ncol = 3, nrow = c)
+
+  for (j in 1:c) {
+    results[j, 1] = rownames(smokers.data.expr)[i]
+    results[j, 2] = rownames(smokers.data.expr)[j]
+    results[j, 3] = angle(as.double(smokers.data.expr[i,]), as.double(smokers.data.expr[j,]))
+  }
+  
+  return(results)
+}
+
+results <- foreach(i = 1:c) %dopar% {
+  calc(i, c)
+}
+
+for (i in 1:length(results)) {
+  smokers.angles = rbind(
+    smokers.angles,
+    matrix(results[i][[1]], ncol = 3)
+  )
+}
+
+smokers.angles = data.frame(smokers.angles)
+smokers.angles$angle = as.double(smokers.angles$angle)
+smokers.angles$angle[is.na(smokers.angles$angle)] <- 0
+
+smokers.angles
+
+non_smokers.angles[smokers.angles$vec_a == smokers.angles$vec_b,]
+```
+
+```{r non-smokers row-wise vectors, message=TRUE, warning=TRUE}
+c <- nrow(smokers.data.expr)
+non_smokers.angles <- matrix(ncol = 3, nrow = 0)
+colnames(non_smokers.angles) <- c('vec_a', 'vec_b', 'angle')
+
+
+calc <- function(i, c) {
+  results <- matrix(ncol = 3, nrow = c)
+
+  for (j in 1:c) {
+    results[j, 1] = rownames(non_smokers.data.expr)[i]
+    results[j, 2] = rownames(non_smokers.data.expr)[j]
+    results[j, 3] = angle(as.double(non_smokers.data.expr[i,]), as.double(non_smokers.data.expr[j,]))
+  }
+  
+  return(results)
+}
+
+results <- foreach(i = 1:c) %dopar% {
+  calc(i, c)
+}
+
+for (i in 1:length(results)) {
+  non_smokers.angles = rbind(
+    non_smokers.angles,
+    results[i][[1]]
+  )
+}
+
+non_smokers.angles = data.frame(non_smokers.angles)
+non_smokers.angles$angle = as.double(non_smokers.angles$angle)
+non_smokers.angles$angle[is.na(non_smokers.angles$angle)] <- 0
+
+non_smokers.angles
+
+non_smokers.angles[non_smokers.angles$vec_a == non_smokers.angles$vec_b,]
+```
+
+```{r aggregate and grapph angles, message=TRUE, warning=TRUE}
+library("ggplot2")
+
+smokers.angles$type = "smokers"
+smokers.angles$type = factor(smokers.angles$type)
+
+non_smokers.angles$type = "non smokers"
+non_smokers.angles$type = factor(non_smokers.angles$type)
+
+all.angles = rbind(non_smokers.angles, smokers.angles)
+all.angles = all.angles[all.angles$vec_a != all.angles$vec_b,]
+
+plt.angles <- ggplot(all.angles, aes(x=vec_b, y=vec_a, fill=angle)) +
+  geom_tile() +
+  scale_fill_gradient(low="blue", high="yellow") +
+  theme(axis.text.x = element_text(angle = 270))
+plt.angles
+```
+
+## Building a SCE object 
+
+```{r SCE, message=TRUE, warning=TRUE}
+library("SingleCellExperiment")
+
+# non_smokers.data.expr_t$type = factor("non_smokers")
+# non_smokers.data.meta$type = factor("non_smokers")
+# smokers.data.expr_t$type = factor("smokers")
+# smokers.data.meta$type = factor("smokers")
+
+# all.data.expr_t = rbind(non_smokers.data.expr_t, smokers.data.expr_t)
+all.data.expr = cbind(non_smokers.data.expr, smokers.data.expr)
+all.data.meta = rbind(non_smokers.data.meta, smokers.data.meta)
+
+scset <- SingleCellExperiment(
+  assays = list(counts = as.matrix(all.data.expr)),
+  colData = all.data.meta
+)
+
+scset
+```
+
+## Working with the Expression Matrix
+
+```{r expression QC, message=TRUE, warning=TRUE}
+library("scater")
+
+scset.metrics.cell <- perCellQCMetrics(
+  scset
+)
+
+scset.metrics.feature <- perFeatureQCMetrics(
+  scset
+)
+
+hist(scset.metrics.cell$detected, breaks = 25)
+
+head(scset.metrics.cell) 
+# based on metrics.cell we can remove the cells that have low count of detected or/and low count of total?
+head(scset.metrics.feature)
+
+with(scset.metrics.cell, count(total > 5 | detected > 5))
+```

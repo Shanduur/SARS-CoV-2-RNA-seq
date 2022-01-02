@@ -2,7 +2,7 @@
 title: Analysis of smoking status impact on molecular mechanisms of SARS -CoV-2 viral
   entry through single-cell sequencing experiments.
 author: "Mateusz Urbanek"
-date: "8/16/2021"
+date: "12/19/2021"
 output: pdf_document
 ---
 
@@ -22,250 +22,126 @@ if (!require("foreach")) { install.packages("foreach") }
 if (!require("parallel")) { install.packages("parallel") }
 if (!require("doParallel")) { install.packages("doParallel") }
 
+if (!require("umap")) { install.packages("umap") }
+
+if (!require("Seurat")) { install.packages("Seurat") }
+if (!require("hdf5r")) { install.packages("hdf5r") }
+
 if (!require("BiocManager")) { 
   install.packages("BiocManager")
   BiocManager::install()  
 }
 
-BiocManager::install(c("SingleCellExperiment", "scater"))
+BiocManager::install(c("SingleCellExperiment", "scater", "GEOquery", "rhdf5", "DropletUtils"))
 ```
 
-# Data
+```{r read ExpressionSet file, message=TRUE, warning=TRUE}
+library("GEOquery")
 
-```{r Loading data from files, message=TRUE, warning=TRUE}
-smokers.file.supp = 'Data/Smokers/file_supplemental_info.tsv'
-smokers.file.expr = 'Data/Smokers/internal_smokerslung.expression.txt'
-smokers.file.meta = 'Data/Smokers/internal_smokerslung.meta.txt'
+gse = getGEO(filename="Data/GSE/GSE122960_series_matrix.txt", GSEMatrix=TRUE, getGPL = FALSE)
 
-non_smokers.file.supp = 'Data/NonSmokers/file_supplemental_info.tsv'
-non_smokers.file.expr = 'Data/NonSmokers/internal_nonsmokerslung.expression.txt'
-non_smokers.file.meta = 'Data/NonSmokers/internal_nonsmokerslung.meta.txt'
-
-library(glue)
-library(data.table)
-options(datatable.fread.datatable=FALSE)
-library(tidyverse)
+x <- phenoData(gse)
+pData(x)
 ```
 
-## Load smokers data
-
-```{r Smokers Data, message=TRUE, warning=TRUE}
-smokers.data.supp <- fread(smokers.file.supp, header = TRUE, sep = "\t", dec = ".")
-head(smokers.data.supp)
-
-# tmp <- fread(smokers.file.expr, header = TRUE, sep = "\t", dec = ".")
-# smokers.data.expr_t <- tmp[,-1]
-# rownames(smokers.data.expr_t) <- tmp[,1]
-# smokers.data.expr_t <- as.data.frame(t(smokers.data.expr_t))
-# head(smokers.data.expr_t)
-
-smokers.data.expr <- fread(smokers.file.expr, header = TRUE, sep = "\t", dec = ".")
-rownames(smokers.data.expr) <- smokers.data.expr[,1]
-smokers.data.expr <- smokers.data.expr[,-c(1)]
-head(smokers.data.expr)
-
-smokers.data.meta <- fread(smokers.file.meta, header = TRUE, sep = "\t", dec = ".")
-smokers.data.meta <- smokers.data.meta[-c(1),]
-rownames(smokers.data.meta) <- smokers.data.meta[,1]
-smokers.data.meta <- smokers.data.meta[,-c(1)]
-head(smokers.data.meta)
+```{r split path function, message=FALSE, warning=FALSE}
+split_path <- function(x) if (dirname(x)==x) x else c(basename(x),split_path(dirname(x)))
 ```
 
-## Load non-smokers data
+```{r read data, message=FALSE, warning=FALSE}
+path.data.raw <- "./Data/GSE/RAW/"
 
-```{r Non-smokers Data, message=TRUE, warning=TRUE}
-non_smokers.data.supp <- fread(non_smokers.file.supp, header = TRUE, sep = "\t", dec = ".")
-head(non_smokers.data.supp)
-
-# tmp <- fread(non_smokers.file.expr, header = TRUE, sep = "\t", dec = ".")
-# non_smokers.data.expr_t <- tmp[,-1]
-# rownames(non_smokers.data.expr_t) <- tmp[,1]
-# non_smokers.data.expr_t <- as.data.frame(t(non_smokers.data.expr_t))
-# head(non_smokers.data.expr_t)
-
-non_smokers.data.expr <- fread(non_smokers.file.expr, header = TRUE, sep = "\t", dec = ".")
-rownames(non_smokers.data.expr) <- non_smokers.data.expr[,1]
-non_smokers.data.expr <- non_smokers.data.expr[,-c(1)]
-head(non_smokers.data.expr)
-
-non_smokers.data.meta <- fread(non_smokers.file.meta, header = TRUE, sep = "\t", dec = ".")
-non_smokers.data.meta <- non_smokers.data.meta[-c(1),]
-rownames(non_smokers.data.meta) <- non_smokers.data.meta[,1]
-non_smokers.data.meta <- non_smokers.data.meta[,-c(1)]
-head(non_smokers.data.meta)
-```
-
-## Calculate average expressions for each gene in each population
-
-```{r smokers avg expression, message=TRUE, warning=TRUE}
-smokers.data.expr.avg <- as.data.frame(rowMeans(smokers.data.expr))
-colnames(smokers.data.expr.avg) <- c("average")
-smokers.data.expr.avg
-```
-
-```{r non_smokers avg expression, message=TRUE, warning=TRUE}
-non_smokers.data.expr.avg <- as.data.frame(rowMeans(non_smokers.data.expr))
-colnames(non_smokers.data.expr.avg) <- c("average")
-non_smokers.data.expr.avg
-```
-
-```{r compare averages, message=TRUE, warning=TRUE}
-non_smokers.data.expr.avg - smokers.data.expr.avg
-```
-
-## Calculating angles between vectors
-
-```{r function for calculating distance, message=TRUE, warning=TRUE}
-library(geometry)
-library(foreach)
-library(parallel)
-library(doParallel)
-registerDoParallel(cores=detectCores())
-
-angle <- function(vec_a, vec_b) {
-  dot.prod = dot(vec_a, vec_b)
-  norm.a = sqrt(sum(vec_a * vec_a))
-  norm.b = sqrt(sum(vec_b * vec_b))
-
-  theta = acos( dot.prod / ( norm.a * norm.b ) )
-  return(theta)
-}
-```
-
-```{r smokers row-wise vectors, message=TRUE, warning=TRUE}
-c <- nrow(smokers.data.expr)
-smokers.angles <- matrix(ncol = 3, nrow = 0)
-colnames(smokers.angles) <- c('vec_a', 'vec_b', 'angle')
-
-calc <- function(i, c) {
-  results <- matrix(ncol = 3, nrow = c)
-
-  for (j in 1:c) {
-    results[j, 1] = rownames(smokers.data.expr)[i]
-    results[j, 2] = rownames(smokers.data.expr)[j]
-    results[j, 3] = angle(as.double(smokers.data.expr[i,]), as.double(smokers.data.expr[j,]))
+for (i in 1:length(gse$title)) {
+  a = split_path(gse$supplementary_file_1[i])
+  b = split_path(gse$supplementary_file_2[i])
+  print(a[1])
+  
+  f1 = paste(path.data.raw, a[1], sep='')
+  if (!file.exists(f1)) {
+    download.file(gse$supplementary_file_1[i], f1)
   }
   
-  return(results)
-}
-
-results <- foreach(i = 1:c) %dopar% {
-  calc(i, c)
-}
-
-for (i in 1:length(results)) {
-  smokers.angles = rbind(
-    smokers.angles,
-    matrix(results[i][[1]], ncol = 3)
-  )
-}
-
-smokers.angles = data.frame(smokers.angles)
-smokers.angles$angle = as.double(smokers.angles$angle)
-smokers.angles$angle[is.na(smokers.angles$angle)] <- 0
-
-smokers.angles
-
-non_smokers.angles[smokers.angles$vec_a == smokers.angles$vec_b,]
-```
-
-```{r non-smokers row-wise vectors, message=TRUE, warning=TRUE}
-c <- nrow(smokers.data.expr)
-non_smokers.angles <- matrix(ncol = 3, nrow = 0)
-colnames(non_smokers.angles) <- c('vec_a', 'vec_b', 'angle')
-
-
-calc <- function(i, c) {
-  results <- matrix(ncol = 3, nrow = c)
-
-  for (j in 1:c) {
-    results[j, 1] = rownames(non_smokers.data.expr)[i]
-    results[j, 2] = rownames(non_smokers.data.expr)[j]
-    results[j, 3] = angle(as.double(non_smokers.data.expr[i,]), as.double(non_smokers.data.expr[j,]))
+  print(b[1])
+  f2 = paste(path.data.raw, b[1], sep='')
+  if (!file.exists(f2)) {
+    download.file(gse$supplementary_file_2[i], f2)
   }
   
-  return(results)
+  print("====================")
+}
+```
+
+```{r read data, message=TRUE, warning=TRUE}
+library(dplyr)
+library(Seurat)
+library(patchwork)
+
+# sce = c()
+# for (f in list.files(path.data.raw, pattern = "*.h5")) {
+#   if (grepl("raw", f, fixed=TRUE)) {
+#     print(f)
+#     sce <- append(sce, Read10X_h5(filename = paste(path.data.raw, f, sep = "")))
+#   }
+# }
+
+for (f in list.files(path.data.raw, pattern = "*.h5")) {
+  if (grepl("raw", f, fixed=TRUE)) {
+    pbmc.data <- Read10X_h5(filename = paste(path.data.raw, f, sep = ""))
+    break
+  }
 }
 
-results <- foreach(i = 1:c) %dopar% {
-  calc(i, c)
-}
+pbmc <- CreateSeuratObject(counts = pbmc.data)
+pbmc[["percent.mt"]] <- PercentageFeatureSet(pbmc, pattern = "^MT-")
+pbmc[["percent.mt"]]
 
-for (i in 1:length(results)) {
-  non_smokers.angles = rbind(
-    non_smokers.angles,
-    results[i][[1]]
-  )
-}
+VlnPlot(pbmc, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 
-non_smokers.angles = data.frame(non_smokers.angles)
-non_smokers.angles$angle = as.double(non_smokers.angles$angle)
-non_smokers.angles$angle[is.na(non_smokers.angles$angle)] <- 0
+plot1 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "percent.mt")
+plot2 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot1 + plot2
 
-non_smokers.angles
+pbmc <- subset(pbmc, subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent.mt < 5)
+pbmc <- NormalizeData(pbmc, normalization.method = "LogNormalize", scale.factor = 10000)
 
-non_smokers.angles[non_smokers.angles$vec_a == non_smokers.angles$vec_b,]
+pbmc <- FindVariableFeatures(pbmc, selection.method = "vst", nfeatures = 2000)
+
+# Identify the 10 most highly variable genes
+top10 <- head(VariableFeatures(pbmc), 10)
+
+# plot variable features with and without labels
+plot1 <- VariableFeaturePlot(pbmc)
+plot2 <- LabelPoints(plot = plot1, points = top10, repel = TRUE)
+plot1 + plot2
+
+all.genes <- rownames(pbmc)
+pbmc <- ScaleData(pbmc, features = all.genes)
+
+pbmc <- RunPCA(pbmc, features = VariableFeatures(object = pbmc))
+
+print(pbmc[["pca"]], dims = 1:5, nfeatures = 5)
+
+VizDimLoadings(pbmc, dims = 1:2, reduction = "pca")
+
+DimPlot(pbmc, reduction = "pca")
+
+DimHeatmap(pbmc, dims = 1, cells = 500, balanced = TRUE)
+
+DimHeatmap(pbmc, dims = 1:15, cells = 500, balanced = TRUE)
+
+pbmc <- JackStraw(pbmc, num.replicate = 100)
+pbmc <- ScoreJackStraw(pbmc, dims = 1:20)
+
+JackStrawPlot(pbmc, dims = 1:15)
+
+pbmc <- FindNeighbors(pbmc, dims = 1:10)
+pbmc <- FindClusters(pbmc, resolution = 0.5)
+
+head(Idents(pbmc), 5)
+
+pbmc <- RunUMAP(pbmc, dims = 1:10)
+
+DimPlot(pbmc, reduction = "umap")
+
 ```
 
-```{r aggregate and grapph angles, message=TRUE, warning=TRUE}
-library("ggplot2")
-
-smokers.angles$type = "smokers"
-smokers.angles$type = factor(smokers.angles$type)
-
-non_smokers.angles$type = "non smokers"
-non_smokers.angles$type = factor(non_smokers.angles$type)
-
-all.angles = rbind(non_smokers.angles, smokers.angles)
-all.angles = all.angles[all.angles$vec_a != all.angles$vec_b,]
-
-plt.angles <- ggplot(all.angles, aes(x=vec_b, y=vec_a, fill=angle)) +
-  geom_tile() +
-  scale_fill_gradient(low="blue", high="yellow") +
-  theme(axis.text.x = element_text(angle = 270))
-plt.angles
-```
-
-## Building a SCE object 
-
-```{r SCE, message=TRUE, warning=TRUE}
-library("SingleCellExperiment")
-
-# non_smokers.data.expr_t$type = factor("non_smokers")
-# non_smokers.data.meta$type = factor("non_smokers")
-# smokers.data.expr_t$type = factor("smokers")
-# smokers.data.meta$type = factor("smokers")
-
-# all.data.expr_t = rbind(non_smokers.data.expr_t, smokers.data.expr_t)
-all.data.expr = cbind(non_smokers.data.expr, smokers.data.expr)
-all.data.meta = rbind(non_smokers.data.meta, smokers.data.meta)
-
-scset <- SingleCellExperiment(
-  assays = list(counts = as.matrix(all.data.expr)),
-  colData = all.data.meta
-)
-
-scset
-```
-
-## Working with the Expression Matrix
-
-```{r expression QC, message=TRUE, warning=TRUE}
-library("scater")
-
-scset.metrics.cell <- perCellQCMetrics(
-  scset
-)
-
-scset.metrics.feature <- perFeatureQCMetrics(
-  scset
-)
-
-hist(scset.metrics.cell$detected, breaks = 25)
-
-head(scset.metrics.cell) 
-# based on metrics.cell we can remove the cells that have low count of detected or/and low count of total?
-head(scset.metrics.feature)
-
-with(scset.metrics.cell, count(total > 5 | detected > 5))
-```

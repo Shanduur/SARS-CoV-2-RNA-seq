@@ -1,0 +1,13 @@
+services:
+  jupyter_r:
+    image: jupyter/r-notebook:latest
+    container_name: jupyter-r
+    ports:
+      - 8080:8888
+    volumes:
+      - .:/home/jovyan/work/
+    user: root
+    environment:
+      JUPYTER_ENABLE_LAB: "yes"
+      JUPYTER_TOKEN: "docker"
+      GRANT_SUDO: "yes"
