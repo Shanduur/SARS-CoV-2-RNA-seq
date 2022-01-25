@@ -1,6 +1,6 @@
 services:
   jupyter_r:
-    image: jupyter/r-notebook:latest
+    image: jupyter/r-notebook:r-4.1.2
     container_name: jupyter-r
     ports:
       - 8080:8888
