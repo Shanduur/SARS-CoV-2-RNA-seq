@@ -18,44 +18,44 @@ h5_files <- mapply(paste, path.data, h5_files, sep='')
 file = h5_files[1]
 
 if (file == 'all') {
-  pbmc.data <- lapply(h5_files, Read10X_h5)
-  pbmc <- lapply(pbmc.data, CreateSeuratObject)
-  rm(pbmc.data)
-  pbmc  <- merge(pbmc[[1]], y = pbmc[2:length(pbmc)])
+  seurat.data <- lapply(h5_files, Read10X_h5)
+  seurat <- lapply(seurat.data, CreateSeuratObject)
+  rm(seurat.data)
+  seurat  <- merge(seurat[[1]], y = seurat[2:length(seurat)])
 } else {
-  pbmc.data <- Read10X_h5(file)
-  pbmc <- CreateSeuratObject(pbmc.data)
-  rm(pbmc.data)
+  seurat.data <- Read10X_h5(file)
+  seurat <- CreateSeuratObject(seurat.data)
+  rm(seurat.data)
 }
 
-pbmc[["percent.mt"]] <- PercentageFeatureSet(pbmc, pattern = "^MT-")
-pbmc[["percent.mt"]]
+seurat[["percent.mt"]] <- PercentageFeatureSet(seurat, pattern = "^MT-")
+seurat[["percent.mt"]]
 
 # Visualize QC metrics as a violin plot
-VlnPlot(pbmc, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, pt.size = 0)
+VlnPlot(seurat, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, pt.size = 0)
 
 # FeatureScatter is typically used to visualize feature-feature relationships, but can be used
 # for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
-plot1 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "percent.mt")
-plot2 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot1 <- FeatureScatter(seurat, feature1 = "nCount_RNA", feature2 = "percent.mt")
+plot2 <- FeatureScatter(seurat, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
 # TODO: histogram
 
-pbmc <- subset(pbmc, subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent.mt < 5)
+seurat <- subset(seurat, subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent.mt < 5)
 
 # Normalizing the data
-pbmc <- NormalizeData(pbmc, normalization.method = "LogNormalize", scale.factor = 10000)
+seurat <- NormalizeData(seurat, normalization.method = "LogNormalize", scale.factor = 10000)
 
 # calculating a subset of features that exhibit high cell-to-cell variation in the dataset
-pbmc <- FindVariableFeatures(pbmc, selection.method = "vst", nfeatures = 2000)
+seurat <- FindVariableFeatures(seurat, selection.method = "vst", nfeatures = 2000)
 # TODO: histogram
 
 # Identify the 10 most highly variable genes
-top10 <- head(VariableFeatures(pbmc), 10)
+top10 <- head(VariableFeatures(seurat), 10)
 
 # plot variable features with and without labels to identify the 10 most highly variable genes
-plot1 <- VariableFeaturePlot(pbmc)
+plot1 <- VariableFeaturePlot(seurat)
 plot2 <- LabelPoints(plot = plot1, points = top10, repel = TRUE)
 plot1 + plot2
 
-saveRDS(pbmc, file=paste(path.data.out, '2-cleaned.rds', sep=''))
+saveRDS(seurat, file=paste(path.data.out, '2-cleaned.rds', sep=''))
