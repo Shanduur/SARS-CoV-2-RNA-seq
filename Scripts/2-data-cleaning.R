@@ -1,7 +1,13 @@
 source("./Scripts/common.R")
 
-if (!require("Seurat")) { install.packages("Seurat") }
-if (!require("hdf5r")) { install.packages("hdf5r") }
+if (!require("Seurat")) {
+  install.packages("Seurat")
+  library(Seurat)
+}
+if (!require("hdf5r")) {
+  install.packages("hdf5r")
+  library(hdf5r)
+}
 
 path.data = path.data.raw
 
@@ -10,9 +16,6 @@ h5_files <- mapply(paste, path.data, h5_files, sep='')
 
 # file = 'all'
 file = h5_files[1]
-
-library(hdf5r)
-library(Seurat)
 
 if (file == 'all') {
   pbmc.data <- lapply(h5_files, Read10X_h5)
@@ -36,6 +39,7 @@ VlnPlot(pbmc, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3
 plot1 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "percent.mt")
 plot2 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
+# TODO: histogram
 
 pbmc <- subset(pbmc, subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent.mt < 5)
 
@@ -44,6 +48,7 @@ pbmc <- NormalizeData(pbmc, normalization.method = "LogNormalize", scale.factor 
 
 # calculating a subset of features that exhibit high cell-to-cell variation in the dataset
 pbmc <- FindVariableFeatures(pbmc, selection.method = "vst", nfeatures = 2000)
+# TODO: histogram
 
 # Identify the 10 most highly variable genes
 top10 <- head(VariableFeatures(pbmc), 10)

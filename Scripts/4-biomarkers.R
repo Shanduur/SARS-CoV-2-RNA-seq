@@ -1,9 +1,13 @@
 source("./Scripts/common.R")
 
+if (!require("Seurat")) { 
+  install.packages("Seurat")
+  library(Seurat)
+}
 if (!require("dplyr")) { 
   install.packages("dplyr")
+  library(dplyr)
 }
-library(dplyr)
 
 pbmc <- readRDS(file=paste(path.data.out, '3-scaled-pca.rds', sep=''))
 
@@ -20,19 +24,6 @@ pbmc <- RunUMAP(pbmc, dims = 1:10)
 DimPlot(pbmc, reduction = "umap")
 
 # Finding differentially expressed features (cluster biomarkers)
-# find all markers of cluster 2
-cluster2.markers <- FindMarkers(pbmc, 
-                                ident.1 = 2, 
-                                min.pct = 0.25)
-head(cluster2.markers, n = 5)
-
-# find all markers distinguishing cluster 5 from clusters 0 and 3
-cluster5.markers <- FindMarkers(pbmc, 
-                                ident.1 = 5, 
-                                ident.2 = c(0, 3), 
-                                min.pct = 0.25)
-head(cluster5.markers, n = 5)
-
 # find markers for every cluster compared to all remaining cells, report only the positive ones
 pbmc.markers <- FindAllMarkers(pbmc, 
                                only.pos = TRUE, 
@@ -42,11 +33,7 @@ pbmc.markers %>%
   group_by(cluster) %>%
   slice_max(n = 2, order_by = avg_log2FC)
 
-cluster0.markers <- FindMarkers(pbmc, 
-                                ident.1 = 0, 
-                                logfc.threshold = 0.25, 
-                                test.use = "roc", 
-                                only.pos = TRUE)
+head(pbmc.markers, n=5)
 
 print(pbmc[["pca"]], dims = 1:5, nfeatures = 5)
 
@@ -55,7 +42,7 @@ VlnPlot(pbmc, features = c("SERPINA1", "CTSH"))
 VlnPlot(pbmc, features = c("SPARCL1", "CLDN5"), slot = "counts", log = TRUE)
 
 FeaturePlot(pbmc, features = c(
-  "SERPINA1", "CTSH", "APOC1", "NPC2"
+  "SFTPC", "SLPI", "C1QA", "C1QB", "IL7R", "KLRB1", "MSR1", "APOC1", "EMP2", "AGER"
 ))
 
 pbmc.markers %>%

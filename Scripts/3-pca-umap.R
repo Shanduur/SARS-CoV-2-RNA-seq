@@ -1,5 +1,10 @@
 source("./Scripts/common.R")
 
+if (!require("Seurat")) { 
+  install.packages("Seurat")
+  library(Seurat)
+}
+
 pbmc <- readRDS(file=paste(path.data.out, '2-cleaned.rds', sep=''))
 
 # linear transformation 

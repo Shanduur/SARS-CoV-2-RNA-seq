@@ -9,7 +9,7 @@ BiocManager::install(c("GEOquery"))
 
 library("GEOquery")
 
-gse = getGEO(filename="./Data/GSE/GSE122960_series_matrix.txt", GSEMatrix=TRUE, getGPL = FALSE)
+gse = getGEO(filename="./Data/Fibrosis/Fibrosis122960_series_matrix.txt", GSEMatrix=TRUE, getGPL = FALSE)
 
 x <- phenoData(gse)
 pData(x)
