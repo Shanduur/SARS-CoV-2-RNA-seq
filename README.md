@@ -45,11 +45,14 @@ The surface receptor angiotensin-converting enzyme 2 (ACE2) and the associated p
 - [Single-Cell Transcriptomic Analysis of Human Lung Provides Insights into the Pathobiology of Pulmonary Fibrosis][pub-fibrosis]
 - [A practical guide to single cell RNA sequencing][pub-sc-rna]
 
-## Courses
+## Courses, tutorials
 
+- [Orchestrating Single-Cell Analysis with Bioconductor][bioconductor-sc-analysis]
 - [Single cell RNA-seq data analysis][sc-chipster]
-- [Introduction to single cell RNA seq][intro-sc-rna-seq]
+- [Introduction to single cell RNA seq][intro-sc-rna-seq-sanger]
 - [Seurat - Guided Clustering Tutorial][seurat-pbmc3k]
+- [Current best practices in single-cell RNA-seq analysis: a tutorial][pub-best-practices]
+- [Introduction to Single-cell RNA-seq (Griffith Lab)][intro-sc-rna-seq-rnabio]
 
 
 <!-- Resources -->
@@ -59,7 +62,9 @@ The surface receptor angiotensin-converting enzyme 2 (ACE2) and the associated p
 [data-pneumonia]: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE164948
 [data-smokers]: https://singlecell.broadinstitute.org/single_cell/study/SCP876/hca-lungmap-covid-19-smokers-lung?scpbr=hca-covid-19-integrated-analysis
 
-[intro-sc-rna-seq]: https://scrnaseq-course.cog.sanger.ac.uk/website/introduction-to-single-cell-rna-seq.html
+[bioconductor-sc-analysis]: https://bioconductor.org/books/release/OSCA/
+[intro-sc-rna-seq-rnabio]: https://rnabio.org/module-08-scrna/0008/01/01/Intro_to_scRNA/
+[intro-sc-rna-seq-sanger]: https://scrnaseq-course.cog.sanger.ac.uk/website/introduction-to-single-cell-rna-seq.html
 
 [sc-broadinstitute]: https://singlecell.broadinstitute.org/
 [sc-chipster]: https://chipster.rahtiapp.fi/manual/courses.html#single-cell
@@ -70,6 +75,7 @@ The surface receptor angiotensin-converting enzyme 2 (ACE2) and the associated p
 [pub-org]: https://www.biorxiv.org/content/10.1101/2020.04.19.049254v2
 [pub-sc-rna]: https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-017-0467-4
 [pub-pneumonia]: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8382293/
+[pub-best-practices]: https://www.embopress.org/doi/full/10.15252/msb.20188746
 
 [yt-statquest-rna-seq]: https://www.youtube.com/watch?v=tlf6wYJrwKY
 [yt-chow-sc-seq]: https://www.youtube.com/watch?v=k9VFNLLQP8c

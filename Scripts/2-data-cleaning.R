@@ -4,6 +4,10 @@ if (!require("Seurat")) {
   install.packages("Seurat")
   library(Seurat)
 }
+if (!require("ggplot2")) {
+  install.packages("ggplot2")
+  library(ggplot2)
+}
 if (!require("hdf5r")) {
   install.packages("hdf5r")
   library(hdf5r)
@@ -29,16 +33,22 @@ if (file == 'all') {
 }
 
 seurat[["percent.mt"]] <- PercentageFeatureSet(seurat, pattern = "^MT-")
-seurat[["percent.mt"]]
+head(seurat[["percent.mt"]], n=20)
 
 # Visualize QC metrics as a violin plot
-VlnPlot(seurat, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, pt.size = 0)
+VlnPlot(seurat, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, pt.size = 0.001)
+VlnPlot(seurat, features = c("nFeature_RNA"), ncol = 3, pt.size = 0.00001)
+VlnPlot(seurat, features = c("nCount_RNA"), ncol = 3, pt.size = 0.00001)
+VlnPlot(seurat, features = c("percent.mt"), ncol = 3, pt.size = 0.00001)
+
+
 
 # FeatureScatter is typically used to visualize feature-feature relationships, but can be used
 # for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
 plot1 <- FeatureScatter(seurat, feature1 = "nCount_RNA", feature2 = "percent.mt")
 plot2 <- FeatureScatter(seurat, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
+
 # TODO: histogram
 
 seurat <- subset(seurat, subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent.mt < 5)
