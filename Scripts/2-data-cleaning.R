@@ -13,6 +13,7 @@ if (!require("hdf5r")) {
   library(hdf5r)
 }
 
+# path.data = path.data.filtred
 path.data = path.data.raw
 
 h5_files <- list.files(path.data, pattern = "*.h5")
@@ -29,19 +30,29 @@ if (file == 'all') {
 } else {
   seurat.data <- Read10X_h5(file)
   seurat <- CreateSeuratObject(seurat.data)
-  rm(seurat.data)
+  hist(colSums(seurat.data),
+       breaks = 100, main = "Expression sum per cell",
+       xlab = "Sum expression")
+  # rm(seurat.data)
 }
+
+
 
 seurat[["percent.mt"]] <- PercentageFeatureSet(seurat, pattern = "^MT-")
 head(seurat[["percent.mt"]], n=20)
+p1 = barplot(table(seurat[["nFeature_RNA"]]))
+p2 = barplot(table(seurat[["percent.mt"]]))
+p3 = barplot(table(seurat[["nCount_RNA"]]))
+p1 + p2 + p3
+
+hist(assay(seurat))
 
 # Visualize QC metrics as a violin plot
 VlnPlot(seurat, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, pt.size = 0.001)
-VlnPlot(seurat, features = c("nFeature_RNA"), ncol = 3, pt.size = 0.00001)
-VlnPlot(seurat, features = c("nCount_RNA"), ncol = 3, pt.size = 0.00001)
-VlnPlot(seurat, features = c("percent.mt"), ncol = 3, pt.size = 0.00001)
-
-
+VlnPlot(seurat, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, pt.size = 0)
+#VlnPlot(seurat, features = c("nFeature_RNA"), ncol = 3, pt.size = 0.00001)
+#VlnPlot(seurat, features = c("nCount_RNA"), ncol = 3, pt.size = 0.00001)
+#VlnPlot(seurat, features = c("percent.mt"), ncol = 3, pt.size = 0.00001)
 
 # FeatureScatter is typically used to visualize feature-feature relationships, but can be used
 # for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
