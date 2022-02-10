@@ -1,13 +1,13 @@
 source("./Scripts/common.R")
 
-if (!require("Seurat")) { 
+if (!require("Seurat")) {
   install.packages("Seurat")
   library(Seurat)
 }
 
-seurat <- readRDS(file=paste(path.data.out, '2-cleaned.rds', sep=''))
+seurat <- readRDS(file = paste(output_folder, "2-cleaned.rds", sep = ""))
 
-# linear transformation 
+# linear transformation
 # ScaleData():
 # - Shifts the expression of each gene, so that the mean expression across cells is 0
 # - Scales the expression of each gene, so that the variance across cells is 1
@@ -35,4 +35,4 @@ seurat <- ScoreJackStraw(seurat, dims = 1:20)
 
 JackStrawPlot(seurat, dims = 1:15)
 
-saveRDS(seurat, file = paste(path.data.out, "3-scaled-pca.rds", sep=""))
+saveRDS(seurat, file = paste(output_folder, "3-scaled-pca.rds", sep = ""))
