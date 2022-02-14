@@ -23,32 +23,45 @@ if (!require("Matrix")) {
   library(Matrix)
 }
 
-load_counts <- function(filename, separator) {
+load_counts <- function(filename, separator, project, min_cells, min_features) {
   raw_data <- read.table(file = filename, sep = separator)
   hist(colSums(raw_data),
     breaks = 100,
     main = "Expression sum per cell",
     xlab = "Sum expression"
   )
-  seurat_object <- CreateSeuratObject(raw_data)
+  seurat_object <- CreateSeuratObject(counts = raw_data, 
+                                      min.cells = min_cells, 
+                                      min.features = min_features, 
+                                      project = project)
   return(seurat_object)
 }
 
-load_hdf5 <- function(filename) {
+load_hdf5 <- function(filename, project, min_cells, min_features) {
   raw_data <- Read10X_h5(file)
   hist(colSums(raw_data),
     breaks = 100,
     main = "Expression sum per cell",
     xlab = "Sum expression"
   )
-  seurat_object <- CreateSeuratObject(raw_data)
+  seurat_object <- CreateSeuratObject(counts = raw_data, 
+                                      min.cells = min_cells, 
+                                      min.features = min_features, 
+                                      project = project)
   return(seurat_object)
 }
 
-load_seurat <- function(filename, separator = ";") {
+load_seurat <- function(filename, separator = ",", project = "seurat", min_cells = 100, min_features = 500) {
   if (grepl(filename, ".h5", fixed = TRUE)) {
-    return(load_hdf5(filename))
+    return(load_hdf5(filename = filename,
+                     project = project,
+                     min_cells = min_cells,
+                     min_features = min_features))
   } else {
-    return(load_counts(filename = filename, separator = separator))
+    return(load_counts(filename = filename,
+                       separator = separator,
+                       project = project,
+                       min_cells = min_cells,
+                       min_features = min_features))
   }
 }
