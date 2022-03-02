@@ -51,7 +51,7 @@ print(seurat[["pca"]], dims = 1:5, nfeatures = 5)
 # TODO:
 VlnPlot(seurat, features = c("SERPINA1", "CTSH"))
 
-VlnPlot(seurat, features = c("SPARCL1", "CLDN5"), slot = "counts", log = TRUE)
+VlnPlot(seurat, features = c("SERPINA1", "CTSH"), slot = "counts", log = TRUE)
 
 FeaturePlot(seurat, features = c(
   "SFTPC", "SLPI", "C1QA", "C1QB", "IL7R", "KLRB1", "MSR1", "APOC1", "EMP2", "AGER"

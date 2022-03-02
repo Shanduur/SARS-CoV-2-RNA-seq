@@ -1,0 +1,6 @@
+rm(list = ls())
+#source("./Scripts/1-start-rmote.R")
+source("./Scripts/2-data-loading.R")
+source("./Scripts/3-scale-normalize.R")
+source("./Scripts/4-pca-jackstraw.R")
+source("./Scripts/5-biomarkers.R")

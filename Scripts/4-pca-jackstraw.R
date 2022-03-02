@@ -27,11 +27,13 @@ DimHeatmap(seurat, dims = 1:15, cells = 500, balanced = TRUE)
 seurat <- JackStraw(seurat, num.replicate = 100)
 seurat <- ScoreJackStraw(seurat, dims = 1:20)
 
-pc.pval <- seurat@reductions$pca@jackstraw@overall.p.values; # get p-value for each PC
-write.table(x = pc.pval,
-            file = paste(output_folder, "PCA_jackstraw_scores.xls"),
+# smn - algorytmy grupowania grafowe, nieliniowe
+
+pc_pval <- seurat@reductions$pca@jackstraw@overall.p.values; # get p-value for each PC
+write.table(x = pc_pval,
+            file = paste(output_folder, "PCA_jackstraw_scores.xls", sep = ""),
             quote = FALSE,
-            sep = '\t',
+            sep = "\t",
             col.names = TRUE);
 
 JackStrawPlot(seurat, dims = 1:15)
