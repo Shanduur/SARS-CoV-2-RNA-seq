@@ -48,6 +48,7 @@ The surface receptor angiotensin-converting enzyme 2 (ACE2) and the associated p
 ## Courses, tutorials
 
 - [Orchestrating Single-Cell Analysis with Bioconductor][bioconductor-sc-analysis]
+- [Getting Started with Seurat][satijalab-tutorials]
 - [Single cell RNA-seq data analysis][sc-chipster]
 - [Introduction to single cell RNA seq][intro-sc-rna-seq-sanger]
 - [Seurat - Guided Clustering Tutorial][seurat-pbmc3k]
@@ -63,6 +64,7 @@ The surface receptor angiotensin-converting enzyme 2 (ACE2) and the associated p
 [data-smokers]: https://singlecell.broadinstitute.org/single_cell/study/SCP876/hca-lungmap-covid-19-smokers-lung?scpbr=hca-covid-19-integrated-analysis
 
 [bioconductor-sc-analysis]: https://bioconductor.org/books/release/OSCA/
+[satijalab-tutorials]: https://satijalab.org/seurat/articles/get_started.html
 [intro-sc-rna-seq-rnabio]: https://rnabio.org/module-08-scrna/0008/01/01/Intro_to_scRNA/
 [intro-sc-rna-seq-sanger]: https://scrnaseq-course.cog.sanger.ac.uk/website/introduction-to-single-cell-rna-seq.html
 

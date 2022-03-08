@@ -9,7 +9,7 @@ if (!require("ggplot2")) {
   library(ggplot2)
 }
 
-seurat <- readRDS(file = paste(output_folder, "2-loaded.rds", sep = ""))
+seurat <- readRDS(file = paste0(output_folder, "2-loaded.rds"))
 
 # Normalizing the data
 seurat <- NormalizeData(seurat, normalization.method = "LogNormalize", scale.factor = 1e4)
@@ -17,11 +17,11 @@ seurat <- NormalizeData(seurat, normalization.method = "LogNormalize", scale.fac
 # calculating a subset of features that exhibit high cell-to-cell variation in the dataset
 # próg powinien zostać dobrany w inny sposób, np. modelowanie (mieszanie rozkładów normalnych)
 seurat <- FindVariableFeatures(seurat, selection.method = "vst", nfeatures = 2000)
-print(paste("Number of Variable Features: ", length(x = VariableFeatures(object = seurat))));
+print(paste0("Number of Variable Features: ", length(x = VariableFeatures(object = seurat))));
 
 # Identify the 10 most highly variable genes
 top10 <- head(VariableFeatures(seurat), 10)
-print(paste("Top 10 most highly variable genes: ", toString(top10)))
+print(paste0("Top 10 most highly variable genes: ", toString(top10)))
 
 # linear transformation
 # ScaleData():
@@ -39,4 +39,4 @@ plot1 + plot2
 
 plot2
 
-saveRDS(seurat, file = paste(output_folder, "3-scaled-normalized.rds", sep = ""))
+saveRDS(seurat, file = paste0(output_folder, "3-scaled-normalized.rds"))

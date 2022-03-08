@@ -23,13 +23,13 @@ for (i in 1:length(gse$title)) {
   b <- split_path(gse$supplementary_file_2[i])
   print(a[1])
 
-  f1 <- paste("Filtred/", a[1], sep = "")
+  f1 <- paste0("Filtred/", a[1])
   if (!file.exists(f1)) {
     download.file(gse$supplementary_file_1[i], f1)
   }
 
   print(b[1])
-  f2 <- paste("RAW/", b[1], sep = "")
+  f2 <- paste0("RAW/", b[1])
   if (!file.exists(f2)) {
     download.file(gse$supplementary_file_2[i], f2)
   }

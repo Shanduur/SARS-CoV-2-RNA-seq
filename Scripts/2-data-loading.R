@@ -9,27 +9,28 @@ if (!require("ggplot2")) {
   library(ggplot2)
 }
 
-samples = c("cap-ctrl","covid-ctrl","covid-cap")
-files = c("./Data/Pneumonia/GSE164948_cap_control_RNA_counts.csv",
+samples <- c("cap-ctrl", "covid-ctrl", "covid-cap")
+files <- c("./Data/Pneumonia/GSE164948_cap_control_RNA_counts.csv",
           "./Data/Pneumonia/GSE164948_covid_control_RNA_counts.csv",
           "./Data/Pneumonia/GSE164948_covid_cap_RNA_counts.csv")
 
-seurat_list = list()
+seurat_list <- list()
 
 for (i in 1:length(files)) {
   seurat_list[[i]] <- load_seurat(filename = files[i],
                                   project = samples[i])
-  seurat_list[[i]][["DataSet"]] = samples[i];
+  seurat_list[[i]][["DataSet"]] <- samples[i];
 }
 
-seurat <- merge(x = seurat_list[[1]], 
+seurat <- merge(x = seurat_list[[1]],
                 y = c(seurat_list[[2]], seurat_list[[3]]),
-                add.cell.ids = samples, 
+                add.cell.ids = samples,
                 project = "SARS-CoV-2-RNA-seq");
 
 str(seurat@meta.data)
 
 seurat[["percent.mt"]] <- PercentageFeatureSet(seurat, pattern = "^MT-")
+seurat[["percent.rb"]] <- PercentageFeatureSet(seurat, pattern = "^RB-")
 head(seurat[["percent.mt"]], n = 20)
 hist(table(seurat[["nFeature_RNA"]]))
 hist(table(seurat[["percent.mt"]]))
@@ -42,25 +43,32 @@ VlnPlot(seurat, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol =
 # FeatureScatter is typically used to visualize feature-feature relationships, but can be used
 # for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
 plot1 <- FeatureScatter(seurat, feature1 = "nCount_RNA", feature2 = "percent.mt")
-plot2 <- FeatureScatter(seurat, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot2 <- FeatureScatter(seurat, feature1 = "nCount_RNA", feature2 = "percent.rb")
+plot3 <- FeatureScatter(seurat, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 
 feature_min <- min(seurat@meta.data$nFeature_RNA);
 feature_m <- median(seurat@meta.data$nFeature_RNA)
-feature_max <- max(seurat@meta.data$nFeature_RNA)    
+feature_max <- max(seurat@meta.data$nFeature_RNA)
 feature_s <- sd(seurat@meta.data$nFeature_RNA)
 count_min <- min(seurat@meta.data$nCount_RNA)
 count_max <- max(seurat@meta.data$nCount_RNA)
 count_m <- mean(seurat@meta.data$nCount_RNA)
 count_s <- sd(seurat@meta.data$nCount_RNA)
-count93 <- quantile(seurat@meta.data$nCount_RNA, 0.93)
+count_q <- quantile(seurat@meta.data$nCount_RNA, 0.95)
 
-plot1 + (plot2 
-         + geom_hline(yintercept = 500, color = "red") 
-         + geom_vline(xintercept=count93, color = "red"))
+(plot1
+  + geom_hline(yintercept = 5, color = "red"))
 
-print(paste("Feature stats:", feature_min, feature_m, feature_max, feature_s));
-print(paste("UMI stats:", count_min, count_m, count_max, count_s, count93));
+(plot2
+  + geom_hline(yintercept = 5, color = "red"))
 
-seurat <- subset(seurat, subset = nFeature_RNA > 500 & nCount_RNA < count93 & percent.mt < 5)
+(plot3
+  + geom_hline(yintercept = 500, color = "red")
+  + geom_vline(xintercept = count_q, color = "red"))
 
-saveRDS(seurat, file = paste(output_folder, "2-loaded.rds", sep = ""))
+print(paste0("Feature stats:", feature_min, feature_m, feature_max, feature_s));
+print(paste0("UMI stats:", count_min, count_m, count_max, count_s, count_q));
+
+seurat <- subset(seurat, subset = nFeature_RNA > 500 & nCount_RNA < count_q & percent.mt < 5)
+
+saveRDS(seurat, file = paste0(output_folder, "2-loaded.rds"))
