@@ -49,10 +49,18 @@ hist(table(seurat[["nCount_RNA"]]))
 
 # Visualize QC metrics as a violin plot
 loginfo(paste("violin plot 1"))
-VlnPlot(seurat, features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb"), ncol = 3, pt.size = 0.001)
+vln1 <- VlnPlot(seurat,
+                features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb"),
+                ncol = 3,
+                pt.size = 0.001)
+print(vln1)
 
 loginfo(paste("violin plot 2"))
-VlnPlot(seurat, features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb"), ncol = 3, pt.size = 0)
+vln2 <- VlnPlot(seurat,
+                features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb"),
+                ncol = 3,
+                pt.size = 0)
+print(vln2)
 
 # FeatureScatter is typically used to visualize feature-feature relationships, but can be used
 # for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
@@ -71,17 +79,17 @@ count_s <- sd(seurat@meta.data$nCount_RNA)
 count_q <- quantile(seurat@meta.data$nCount_RNA, 0.95)
 
 loginfo(paste("plot1 - percent.mt"))
-(plot1
-  + geom_hline(yintercept = 5, color = "red"))
+print(plot1
+      + geom_hline(yintercept = 5, color = "red"))
 
 loginfo(paste("plot1 - percent.rb"))
-(plot2
-  + geom_hline(yintercept = 5, color = "red"))
+print(plot2
+      + geom_hline(yintercept = 5, color = "red"))
 
 loginfo(paste("plot1 - nFeature_RNA"))
-(plot3
-  + geom_hline(yintercept = 500, color = "red")
-  + geom_vline(xintercept = count_q, color = "red"))
+print(plot3
+      + geom_hline(yintercept = 500, color = "red")
+      + geom_vline(xintercept = count_q, color = "red"))
 
 loginfo(paste("Feature stats:", feature_min, feature_m, feature_max, feature_s));
 loginfo(paste("UMI stats:", count_min, count_m, count_max, count_s, count_q));
