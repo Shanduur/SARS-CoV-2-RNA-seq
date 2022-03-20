@@ -17,13 +17,13 @@ files <- c("./Data/Pneumonia/GSE164948_cap_control_RNA_counts.csv",
 seurat_list <- list()
 
 for (i in 1:length(files)) {
-  log_info(paste("loading file:", files[i]))
+  loginfo(paste("loading file:", files[i]))
   seurat_list[[i]] <- load_seurat(filename = files[i],
                                   project = samples[i])
   seurat_list[[i]][["DataSet"]] <- samples[i];
 }
 
-log_info(paste("building seurat object"))
+loginfo(paste("building seurat object"))
 seurat <- merge(x = seurat_list[[1]],
                 y = c(seurat_list[[2]], seurat_list[[3]]),
                 add.cell.ids = samples,
@@ -35,23 +35,23 @@ seurat[["percent.mt"]] <- PercentageFeatureSet(seurat, pattern = "^MT-")
 seurat[["percent.rb"]] <- PercentageFeatureSet(seurat, pattern = "^RB-")
 head(seurat[["percent.mt"]], n = 20)
 
-log_info(paste("histogram 1: nFeature_RNA"))
+loginfo(paste("histogram 1: nFeature_RNA"))
 hist(table(seurat[["nFeature_RNA"]]))
 
-log_info(paste("histogram 2: percent.mt"))
+loginfo(paste("histogram 2: percent.mt"))
 hist(table(seurat[["percent.mt"]]))
 
-log_info(paste("histogram 3: percent.rb"))
+loginfo(paste("histogram 3: percent.rb"))
 hist(table(seurat[["percent.rb"]]))
 
-log_info(paste("histogram 4: nCount_RNA"))
+loginfo(paste("histogram 4: nCount_RNA"))
 hist(table(seurat[["nCount_RNA"]]))
 
 # Visualize QC metrics as a violin plot
-log_info(paste("violin plot 1"))
+loginfo(paste("violin plot 1"))
 VlnPlot(seurat, features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb"), ncol = 3, pt.size = 0.001)
 
-log_info(paste("violin plot 2"))
+loginfo(paste("violin plot 2"))
 VlnPlot(seurat, features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb"), ncol = 3, pt.size = 0)
 
 # FeatureScatter is typically used to visualize feature-feature relationships, but can be used
@@ -70,21 +70,21 @@ count_m <- mean(seurat@meta.data$nCount_RNA)
 count_s <- sd(seurat@meta.data$nCount_RNA)
 count_q <- quantile(seurat@meta.data$nCount_RNA, 0.95)
 
-log_info(paste("plot1 - percent.mt"))
+loginfo(paste("plot1 - percent.mt"))
 (plot1
   + geom_hline(yintercept = 5, color = "red"))
 
-log_info(paste("plot1 - percent.rb"))
+loginfo(paste("plot1 - percent.rb"))
 (plot2
   + geom_hline(yintercept = 5, color = "red"))
 
-log_info(paste("plot1 - nFeature_RNA"))
+loginfo(paste("plot1 - nFeature_RNA"))
 (plot3
   + geom_hline(yintercept = 500, color = "red")
   + geom_vline(xintercept = count_q, color = "red"))
 
-log_info(paste("Feature stats:", feature_min, feature_m, feature_max, feature_s));
-log_info(paste("UMI stats:", count_min, count_m, count_max, count_s, count_q));
+loginfo(paste("Feature stats:", feature_min, feature_m, feature_max, feature_s));
+loginfo(paste("UMI stats:", count_min, count_m, count_max, count_s, count_q));
 
 seurat <- subset(seurat, subset = nFeature_RNA > 500 & nCount_RNA < count_q & percent.mt < 5)
 

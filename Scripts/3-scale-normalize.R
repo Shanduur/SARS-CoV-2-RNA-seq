@@ -17,11 +17,11 @@ seurat <- NormalizeData(seurat, normalization.method = "LogNormalize", scale.fac
 # calculating a subset of features that exhibit high cell-to-cell variation in the dataset
 # próg powinien zostać dobrany w inny sposób, np. modelowanie (mieszanie rozkładów normalnych)
 seurat <- FindVariableFeatures(seurat, selection.method = "vst", nfeatures = 2000)
-log_info(paste("Number of Variable Features:", length(x = VariableFeatures(object = seurat))));
+loginfo(paste("Number of Variable Features:", length(x = VariableFeatures(object = seurat))));
 
 # Identify the 10 most highly variable genes
 top10 <- head(VariableFeatures(seurat), 10)
-log_info(paste("Top 10 most highly variable genes:", toString(top10)))
+loginfo(paste("Top 10 most highly variable genes:", toString(top10)))
 
 # linear transformation
 # ScaleData():
@@ -36,10 +36,10 @@ seurat <- ScaleData(object = seurat,
 plot1 <- VariableFeaturePlot(seurat)
 plot2 <- LabelPoints(plot = plot1, points = top10, repel = TRUE)
 
-log_info(paste("plot1+plot2 - VariableFeaturePlot"))
+loginfo(paste("plot1+plot2 - VariableFeaturePlot"))
 print(plot1 + plot2)
 
-log_info(paste("plot2 - VariableFeaturePlot labeled"))
+loginfo(paste("plot2 - VariableFeaturePlot labeled"))
 print(plot2)
 
 saveRDS(seurat, file = paste0(output_folder, "3-scaled-normalized.rds"))

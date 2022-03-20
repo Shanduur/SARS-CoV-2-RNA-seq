@@ -34,35 +34,35 @@ seurat <- RunTSNE(object = seurat,
 
 # The goal of the following algorithms is to learn the underlying manifold of the data
 # in order to place similar cells together in low-dimensional space.
-log_info(paste("dim plot - umap"))
+loginfo(paste("dim plot - umap"))
 dp1 <- DimPlot(object = seurat,
               reduction = "umap",
               split.by = "DataSet",
               pt.size = 0.1)
 print(dp1)
 
-log_info(paste("dim plot - tsne"))
+loginfo(paste("dim plot - tsne"))
 dp2 <- DimPlot(object = seurat,
               reduction = "tsne",
               split.by = "DataSet",
               pt.size = 0.1)
 print(dp2)
 
-log_info(paste("dim plot - pca"))
+loginfo(paste("dim plot - pca"))
 dp3 <- DimPlot(object = seurat,
               reduction = "pca",
               split.by = "DataSet",
               pt.size = 0.1)
 print(dp3)
 
-log_info(paste("dim plot - ica"))
+loginfo(paste("dim plot - ica"))
 dp4 <- DimPlot(object = seurat,
               reduction = "ica",
               split.by = "DataSet",
               pt.size = 0.1)
 print(dp4)
 
-log_info(paste("dim plot - mds"))
+loginfo(paste("dim plot - mds"))
 dp5 <- DimPlot(object = seurat,
               reduction = "mds",
               split.by = "DataSet",
@@ -85,13 +85,13 @@ head(seurat_markers, n = 5)
 
 print(seurat[["pca"]], dims = 1:5, nfeatures = 5)
 
-log_info(paste("violin plot - 1"))
+loginfo(paste("violin plot - 1"))
 vln1 <- VlnPlot(seurat,
         features = markers$gene[1:2],
         split.by = "DataSet")
 print(vln1)
 
-log_info(paste("violin plot - 2"))
+loginfo(paste("violin plot - 2"))
 vln2 <- VlnPlot(seurat,
         features = markers$gene[1:2],
         slot = "counts",
@@ -99,7 +99,7 @@ vln2 <- VlnPlot(seurat,
         split.by = "DataSet")
 print(vln2)
 
-log_info(paste("feature plots - 1"))
+loginfo(paste("feature plots - 1"))
 for (i in markers$gene) {
   print(i)
   px <- FeaturePlot(seurat,

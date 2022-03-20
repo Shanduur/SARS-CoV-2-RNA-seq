@@ -22,9 +22,9 @@ if (!require("Matrix")) {
   install.packages("Matrix")
   library(Matrix)
 }
-if (!require("logger")) {
-  install.packages("logger")
-  library(logger)
+if (!require("logging")) {
+  install.packages("logging")
+  library(logging)
 }
 
 load_counts <- function(filename, separator, project, min_cells, min_features) {
@@ -69,3 +69,23 @@ load_seurat <- function(filename, separator = ",", project = "seurat", min_cells
                        min_features = min_features))
   }
 }
+
+src2 <- function() {
+  return(source("Scripts/2-data-loading.R"))
+}
+
+src3 <- function() {
+  return(source("Scripts/3-scale-normalize.R"))
+}
+
+src4 <- function() {
+  return(source("Scripts/4-pca-jackstraw.R"))
+}
+
+src5 <- function() {
+  return(source("Scripts/5-biomarkers.R"))
+}
+
+graphics.off()
+
+loginfo("setup done!")
