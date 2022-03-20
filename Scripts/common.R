@@ -2,6 +2,8 @@
 
 output_folder <- "./Data/Output/"
 
+device <- "pdf"
+
 if (!require("Seurat")) {
   install.packages("Seurat")
   library(Seurat)
@@ -35,13 +37,71 @@ if (!require("stringi")) {
   library(stringi)
 }
 
-load_counts <- function(filename, separator, project, min_cells, min_features) {
-  raw_data <- read.table(file = filename, sep = separator)
-  hist(colSums(raw_data),
+colSumHist <- function(x) {
+  hist(colSums(x),
     breaks = 100,
     main = "Expression sum per cell",
     xlab = "Sum expression"
   )
+}
+
+print_img <- function(x,
+                      fun = NA,
+                      width = 11,
+                      height = 8,
+                      title = NA,
+                      device = NA,
+                      output_folder = "./Data/Output/") {
+  envRmote <- FALSE
+  if ("rmote" %in% .packages(all.available = TRUE)) {
+    if (rmote:::is_rmote_on()) {
+      logwarn("rmote environment active, all printing is piped to rmote")
+
+      envRmote <- TRUE
+      device <- NA
+    }
+  }
+  
+  if (is.na(title)) {
+    title <- format(Sys.time(), "%s")
+  }
+  title <- basename(title)
+  title <- gsub(" ", "_", title)
+
+  graphics.off()
+
+  if (!is.na(device)) {
+    if (device == "pdf") {
+      grDev <- pdf
+    } else if (device == "jpeg") {
+      grDev <- jpeg
+    } else if (device == "png") {
+      grDev <- png
+    }
+
+    grDev(file = file.path(output_folder, paste0(title, ".", device)),
+          width = width,
+          height = height)
+  }
+
+  if (is.na(fun)) {
+    print(x)
+  } else {
+    fun(x)
+  }
+
+  if (!is.na(device)) {
+    dev.off()
+  }
+
+  if (envRmote) {
+    rmote::plot_done()
+  }
+}
+
+load_counts <- function(filename, separator, project, min_cells, min_features) {
+  raw_data <- read.table(file = filename, sep = separator)
+  print_img(raw_data, fun = colSumHist, device = device, title = paste0("histogram", filename))
   seurat_object <- CreateSeuratObject(counts = raw_data,
                                       min.cells = min_cells,
                                       min.features = min_features,
@@ -54,11 +114,7 @@ load_hdf5 <- function(filename,
                       min_cells,
                       min_features) {
   raw_data <- Read10X_h5(file)
-  hist(colSums(raw_data),
-    breaks = 100,
-    main = "Expression sum per cell",
-    xlab = "Sum expression"
-  )
+  print_img(raw_data, fun = colSumHist, device = device, title = paste0("histogram", filename))
   seurat_object <- CreateSeuratObject(counts = raw_data,
                                       min.cells = min_cells,
                                       min.features = min_features,
@@ -72,14 +128,14 @@ load_seurat <- function(filename,
                         min_cells = 100,
                         min_features = 500) {
   if (grepl(".h5", filename, fixed = TRUE)) {
-    loginfo(paste('loading hdf5 file'))
-    
+    loginfo(paste("loading hdf5 file"))
+
     return(load_hdf5(filename = filename,
                      project = project,
                      min_cells = min_cells,
                      min_features = min_features))
   } else {
-    loginfo(paste('loading regular file'))
+    loginfo(paste("loading regular file"))
 
     if (!separator) {
       if (grepl(".txt", filename, fixed = TRUE) || grepl(".tsv", filename, fixed = TRUE)) {
@@ -99,16 +155,6 @@ load_seurat <- function(filename,
                        project = project,
                        min_cells = min_cells,
                        min_features = min_features))
-  }
-}
-
-print_img <- function(x) {
-  graphics.off()
-  print(x)
-  if ("rmote" %in% .packages(all.available = TRUE)) {
-    if (rmote:::is_rmote_on()) {
-      rmote::plot_done()
-    }
   }
 }
 

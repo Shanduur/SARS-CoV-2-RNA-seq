@@ -1,5 +1,8 @@
 source("./Scripts/common.R")
 
+# device <- "pdf"
+device <- NA
+
 if (!require("Seurat")) {
   install.packages("Seurat")
   library(Seurat)
@@ -41,16 +44,28 @@ seurat[["percent.rb"]] <- PercentageFeatureSet(seurat, pattern = "^RB-")
 head(seurat[["percent.mt"]], n = 20)
 
 loginfo(paste("histogram 1: nFeature_RNA"))
-hist(table(seurat[["nFeature_RNA"]]))
+print_img(table(seurat[["nFeature_RNA"]]),
+          fun = hist,
+          title = nFeature_RNA,
+          device = device)
 
 loginfo(paste("histogram 2: percent.mt"))
-hist(table(seurat[["percent.mt"]]))
+print_img(table(seurat[["percent.mt"]]),
+          fun = hist,
+          title = "percent-mt",
+          device = device)
 
 loginfo(paste("histogram 3: percent.rb"))
-hist(table(seurat[["percent.rb"]]))
+print_img(table(seurat[["percent.rb"]]),
+          fun = hist,
+          title = "percent-rb",
+          device = device)
 
 loginfo(paste("histogram 4: nCount_RNA"))
-hist(table(seurat[["nCount_RNA"]]))
+print_img(table(seurat[["nCount_RNA"]]),
+          fun = hist,
+          title = "nCount_RNA",
+          device = device)
 
 # Visualize QC metrics as a violin plot
 loginfo(paste("violin plot 1"))
@@ -59,7 +74,9 @@ vln1 <- VlnPlot(seurat,
   ncol = 3,
   pt.size = 0.001
 )
-print_img(vln1)
+print_img(vln1,
+          title = "violin-qc-metrics-1",
+          device = device)
 
 loginfo(paste("violin plot 2"))
 vln2 <- VlnPlot(seurat,
@@ -67,7 +84,9 @@ vln2 <- VlnPlot(seurat,
   ncol = 3,
   pt.size = 0
 )
-print_img(vln2)
+print_img(vln2,
+          title = "violin-qc-metrics-2",
+          device = device)
 
 # FeatureScatter is typically used to visualize feature-feature relationships, but can be used
 # for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
@@ -86,15 +105,21 @@ count_s <- sd(seurat@meta.data$nCount_RNA)
 count_q <- quantile(seurat@meta.data$nCount_RNA, 0.95)
 
 loginfo(paste("plot1 - percent.mt"))
-print_img(plot1 + geom_hline(yintercept = 5, color = "red"))
+print_img(plot1 + geom_hline(yintercept = 5, color = "red"),
+          title = "plot1 - percent.mt",
+          device = device)
 
-loginfo(paste("plot1 - percent.rb"))
-print_img(plot2 + geom_hline(yintercept = 5, color = "red"))
+loginfo(paste("plot2 - percent.rb"))
+print_img(plot2 + geom_hline(yintercept = 5, color = "red"),
+          title = "plot2 - percent.rb",
+          device = device)
 
-loginfo(paste("plot1 - nFeature_RNA"))
+loginfo(paste("plot3 - nFeature_RNA"))
 print_img(plot3 +
             geom_hline(yintercept = 500, color = "red") +
-            geom_vline(xintercept = count_q, color = "red"))
+            geom_vline(xintercept = count_q, color = "red"),
+          title = "plot3 - nFeature_RNA",
+          device = device)
 
 loginfo(paste("Feature stats:", feature_min, feature_m, feature_max, feature_s))
 loginfo(paste("UMI stats:", count_min, count_m, count_max, count_s, count_q))
