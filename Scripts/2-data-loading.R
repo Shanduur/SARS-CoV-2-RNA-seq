@@ -16,12 +16,15 @@ files <- c("./Data/Pneumonia/GSE164948_cap_control_RNA_counts.csv",
 
 seurat_list <- list()
 
+print(paste("loading files:", files))
+
 for (i in 1:length(files)) {
   seurat_list[[i]] <- load_seurat(filename = files[i],
                                   project = samples[i])
   seurat_list[[i]][["DataSet"]] <- samples[i];
 }
 
+print(paste("building seurat object"))
 seurat <- merge(x = seurat_list[[1]],
                 y = c(seurat_list[[2]], seurat_list[[3]]),
                 add.cell.ids = samples,
@@ -32,14 +35,25 @@ str(seurat@meta.data)
 seurat[["percent.mt"]] <- PercentageFeatureSet(seurat, pattern = "^MT-")
 seurat[["percent.rb"]] <- PercentageFeatureSet(seurat, pattern = "^RB-")
 head(seurat[["percent.mt"]], n = 20)
+
+print(paste("histogram 1: nFeature_RNA"))
 hist(table(seurat[["nFeature_RNA"]]))
+
+print(paste("histogram 2: percent.mt"))
 hist(table(seurat[["percent.mt"]]))
+
+print(paste("histogram 3: percent.rb"))
 hist(table(seurat[["percent.rb"]]))
+
+print(paste("histogram 4: nCount_RNA"))
 hist(table(seurat[["nCount_RNA"]]))
 
 # Visualize QC metrics as a violin plot
-VlnPlot(seurat, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, pt.size = 0.001)
-VlnPlot(seurat, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, pt.size = 0)
+print(paste("violin plot 1"))
+VlnPlot(seurat, features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb"), ncol = 3, pt.size = 0.001)
+
+print(paste("violin plot 2"))
+VlnPlot(seurat, features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb"), ncol = 3, pt.size = 0)
 
 # FeatureScatter is typically used to visualize feature-feature relationships, but can be used
 # for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
@@ -57,12 +71,15 @@ count_m <- mean(seurat@meta.data$nCount_RNA)
 count_s <- sd(seurat@meta.data$nCount_RNA)
 count_q <- quantile(seurat@meta.data$nCount_RNA, 0.95)
 
+print(paste("plot1 - percent.mt"))
 (plot1
   + geom_hline(yintercept = 5, color = "red"))
 
+print(paste("plot1 - percent.rb"))
 (plot2
   + geom_hline(yintercept = 5, color = "red"))
 
+print(paste("plot1 - nFeature_RNA"))
 (plot3
   + geom_hline(yintercept = 500, color = "red")
   + geom_vline(xintercept = count_q, color = "red"))

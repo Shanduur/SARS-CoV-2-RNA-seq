@@ -35,8 +35,11 @@ seurat <- ScaleData(object = seurat,
 # plot variable features with and without labels to identify the 10 most highly variable genes
 plot1 <- VariableFeaturePlot(seurat)
 plot2 <- LabelPoints(plot = plot1, points = top10, repel = TRUE)
+
+print(paste("plot1+plot2 - VariableFeaturePlot"))
 plot1 + plot2
 
+print(paste("plot1+plot2 - VariableFeaturePlot labeled"))
 plot2
 
 saveRDS(seurat, file = paste0(output_folder, "3-scaled-normalized.rds"))

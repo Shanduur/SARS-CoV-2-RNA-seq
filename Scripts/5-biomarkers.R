@@ -34,23 +34,40 @@ seurat <- RunTSNE(object = seurat,
 
 # The goal of the following algorithms is to learn the underlying manifold of the data
 # in order to place similar cells together in low-dimensional space.
+print(paste("dim plot - umap"))
 p1 <- DimPlot(object = seurat,
               reduction = "umap",
               split.by = "DataSet",
-              pt.size=0.1)
+              pt.size = 0.1)
+print(p1)
+
+print(paste("dim plot - tsne"))
 p2 <- DimPlot(object = seurat,
               reduction = "tsne",
               split.by = "DataSet",
-              pt.size=0.1)
+              pt.size = 0.1)
+print(p2)
+
+print(paste("dim plot - pca"))
 p3 <- DimPlot(object = seurat,
               reduction = "pca",
               split.by = "DataSet",
-              pt.size=0.1)
-print(p1)
-print(p2)
+              pt.size = 0.1)
 print(p3)
 
-plot_grid(p1, p2)
+print(paste("dim plot - pca"))
+p4 <- DimPlot(object = seurat,
+              reduction = "ica",
+              split.by = "DataSet",
+              pt.size = 0.1)
+print(p4)
+
+print(paste("dim plot - mds"))
+p5 <- DimPlot(object = seurat,
+              reduction = "mds",
+              split.by = "DataSet",
+              pt.size = 0.1)
+print(p5)
 
 # Finding differentially expressed features (cluster biomarkers)
 # find markers for every cluster compared to all remaining cells, report only the positive ones
@@ -68,19 +85,22 @@ head(seurat_markers, n = 5)
 
 print(seurat[["pca"]], dims = 1:5, nfeatures = 5)
 
+print(paste("violin plot - 1"))
 VlnPlot(seurat,
         features = markers$gene[1:2],
         split.by = "DataSet")
 
+print(paste("violin plot - 2"))
 VlnPlot(seurat,
         features = markers$gene[1:2],
         slot = "counts",
         log = TRUE,
         split.by = "DataSet")
 
+print(paste("feature plots - 1"))
 for (i in markers$gene) {
   print(i)
-  px <- FeaturePlot(seurat, 
+  px <- FeaturePlot(seurat,
               features = i,
               split.by = "DataSet")
   print(px)
