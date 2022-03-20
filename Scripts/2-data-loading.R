@@ -11,10 +11,9 @@ if (!require("ggplot2")) {
 
 samples <- c("cap-ctrl", "covid-ctrl", "covid-cap")
 files <- c(
-  "./Data/SARS-COV-2/Smokers/internal_smokerslung.expression.txt"
-  # "./Data/Pneumonia/GSE164948_cap_control_RNA_counts.csv",
-  # "./Data/Pneumonia/GSE164948_covid_control_RNA_counts.csv",
-  # "./Data/Pneumonia/GSE164948_covid_cap_RNA_counts.csv"
+  "./Data/Pneumonia/GSE164948_cap_control_RNA_counts.csv",
+  "./Data/Pneumonia/GSE164948_covid_control_RNA_counts.csv",
+  "./Data/Pneumonia/GSE164948_covid_cap_RNA_counts.csv"
 )
 
 seurat_list <- list()

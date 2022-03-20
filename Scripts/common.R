@@ -37,7 +37,7 @@ if (!require("stringi")) {
 
 load_counts <- function(filename, separator, project, min_cells, min_features) {
   raw_data <- read.table(file = filename, sep = separator)
-  head(raw_data)
+  print(head(raw_data))
   hist(colSums(raw_data),
     breaks = 100,
     main = "Expression sum per cell",
@@ -50,9 +50,12 @@ load_counts <- function(filename, separator, project, min_cells, min_features) {
   return(seurat_object)
 }
 
-load_hdf5 <- function(filename, project, min_cells, min_features) {
+load_hdf5 <- function(filename,
+                      project,
+                      min_cells,
+                      min_features) {
   raw_data <- Read10X_h5(file)
-  head(raw_data)
+  print(head(raw_data))
   hist(colSums(raw_data),
     breaks = 100,
     main = "Expression sum per cell",
@@ -65,7 +68,11 @@ load_hdf5 <- function(filename, project, min_cells, min_features) {
   return(seurat_object)
 }
 
-load_seurat <- function(filename, separator = FALSE, project = "seurat", min_cells = 100, min_features = 500) {
+load_seurat <- function(filename,
+                        separator = FALSE,
+                        project = "seurat",
+                        min_cells = 100,
+                        min_features = 500) {
   if (grepl(".h5", filename, fixed = TRUE)) {
     loginfo(paste('loading hdf5 file'))
     
