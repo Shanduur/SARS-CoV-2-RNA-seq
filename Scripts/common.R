@@ -37,7 +37,6 @@ if (!require("stringi")) {
 
 load_counts <- function(filename, separator, project, min_cells, min_features) {
   raw_data <- read.table(file = filename, sep = separator)
-  print(head(raw_data))
   hist(colSums(raw_data),
     breaks = 100,
     main = "Expression sum per cell",
@@ -55,7 +54,6 @@ load_hdf5 <- function(filename,
                       min_cells,
                       min_features) {
   raw_data <- Read10X_h5(file)
-  print(head(raw_data))
   hist(colSums(raw_data),
     breaks = 100,
     main = "Expression sum per cell",
