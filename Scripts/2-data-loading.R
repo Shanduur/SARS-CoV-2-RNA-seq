@@ -34,6 +34,7 @@ seurat[["percent.rb"]] <- PercentageFeatureSet(seurat, pattern = "^RB-")
 head(seurat[["percent.mt"]], n = 20)
 hist(table(seurat[["nFeature_RNA"]]))
 hist(table(seurat[["percent.mt"]]))
+hist(table(seurat[["percent.rb"]]))
 hist(table(seurat[["nCount_RNA"]]))
 
 # Visualize QC metrics as a violin plot
