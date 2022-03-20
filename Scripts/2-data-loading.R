@@ -72,3 +72,4 @@ print(paste0("UMI stats:", count_min, count_m, count_max, count_s, count_q));
 seurat <- subset(seurat, subset = nFeature_RNA > 500 & nCount_RNA < count_q & percent.mt < 5)
 
 saveRDS(seurat, file = paste0(output_folder, "2-loaded.rds"))
+rm(seurat_list)

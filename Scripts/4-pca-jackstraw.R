@@ -15,6 +15,11 @@ seurat <- RunICA(seurat, nics = 40)
 seurat <- ProjectDim(object = seurat)
 
 
+d <- dist(t(GetAssayData(seurat, slot = "scale.data")))
+mds <- cmdscale(d = d, k = 2)
+colnames(mds) <- paste0("MDS_", 1:2)
+seurat[["mds"]] <- CreateDimReducObject(embeddings = mds, key = "MDS_", assay = DefaultAssay(seurat))
+
 # Examine and visualize PCA results a few different ways
 print(seurat[["pca"]], dims = 1:5, nfeatures = 5)
 print(seurat[["ica"]], dims = 1:5, nfeatures = 5)
@@ -24,6 +29,7 @@ VizDimLoadings(seurat, dims = 1:2, reduction = "ica")
 
 DimPlot(seurat, reduction = "pca")
 DimPlot(seurat, reduction = "ica")
+DimPlot(seurat, reduction = "mds")
 
 DimHeatmap(seurat, dims = 1, cells = 500, balanced = TRUE)
 
