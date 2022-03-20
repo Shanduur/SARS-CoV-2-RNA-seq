@@ -74,7 +74,7 @@ print_img <- function(x) {
   graphics.off()
   print(x)
   if ("rmote" %in% .packages(all.available = TRUE)) {
-    if (rmote:::is_rmote_started()) {
+    if (rmote:::is_rmote_on()) {
       rmote::plot_done()
     }
   }
