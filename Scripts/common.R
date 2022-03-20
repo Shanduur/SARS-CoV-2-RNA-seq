@@ -22,6 +22,10 @@ if (!require("Matrix")) {
   install.packages("Matrix")
   library(Matrix)
 }
+if (!require("logger")) {
+  install.packages("logger")
+  library(logger)
+}
 
 load_counts <- function(filename, separator, project, min_cells, min_features) {
   raw_data <- read.table(file = filename, sep = separator)

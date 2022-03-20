@@ -34,40 +34,40 @@ seurat <- RunTSNE(object = seurat,
 
 # The goal of the following algorithms is to learn the underlying manifold of the data
 # in order to place similar cells together in low-dimensional space.
-print(paste("dim plot - umap"))
-p1 <- DimPlot(object = seurat,
+log_info(paste("dim plot - umap"))
+dp1 <- DimPlot(object = seurat,
               reduction = "umap",
               split.by = "DataSet",
               pt.size = 0.1)
-print(p1)
+print(dp1)
 
-print(paste("dim plot - tsne"))
-p2 <- DimPlot(object = seurat,
+log_info(paste("dim plot - tsne"))
+dp2 <- DimPlot(object = seurat,
               reduction = "tsne",
               split.by = "DataSet",
               pt.size = 0.1)
-print(p2)
+print(dp2)
 
-print(paste("dim plot - pca"))
-p3 <- DimPlot(object = seurat,
+log_info(paste("dim plot - pca"))
+dp3 <- DimPlot(object = seurat,
               reduction = "pca",
               split.by = "DataSet",
               pt.size = 0.1)
-print(p3)
+print(dp3)
 
-print(paste("dim plot - pca"))
-p4 <- DimPlot(object = seurat,
+log_info(paste("dim plot - ica"))
+dp4 <- DimPlot(object = seurat,
               reduction = "ica",
               split.by = "DataSet",
               pt.size = 0.1)
-print(p4)
+print(dp4)
 
-print(paste("dim plot - mds"))
-p5 <- DimPlot(object = seurat,
+log_info(paste("dim plot - mds"))
+dp5 <- DimPlot(object = seurat,
               reduction = "mds",
               split.by = "DataSet",
               pt.size = 0.1)
-print(p5)
+print(dp5)
 
 # Finding differentially expressed features (cluster biomarkers)
 # find markers for every cluster compared to all remaining cells, report only the positive ones
@@ -85,19 +85,21 @@ head(seurat_markers, n = 5)
 
 print(seurat[["pca"]], dims = 1:5, nfeatures = 5)
 
-print(paste("violin plot - 1"))
-VlnPlot(seurat,
+log_info(paste("violin plot - 1"))
+vln1 <- VlnPlot(seurat,
         features = markers$gene[1:2],
         split.by = "DataSet")
+print(vln1)
 
-print(paste("violin plot - 2"))
-VlnPlot(seurat,
+log_info(paste("violin plot - 2"))
+vln2 <- VlnPlot(seurat,
         features = markers$gene[1:2],
         slot = "counts",
         log = TRUE,
         split.by = "DataSet")
+print(vln2)
 
-print(paste("feature plots - 1"))
+log_info(paste("feature plots - 1"))
 for (i in markers$gene) {
   print(i)
   px <- FeaturePlot(seurat,
@@ -109,4 +111,5 @@ for (i in markers$gene) {
 seurat_markers %>%
   group_by(cluster) %>%
   top_n(n = 10, wt = avg_log2FC) -> top10
-DoHeatmap(seurat, features = top10$gene) + NoLegend()
+hm1 <- DoHeatmap(seurat, features = top10$gene) + NoLegend()
+print(hm1)

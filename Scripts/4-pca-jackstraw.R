@@ -13,22 +13,21 @@ if (!require("parallelDist")) {
 seurat <- readRDS(file = paste0(output_folder, "3-scaled-normalized.rds"))
 
 # Performing linear dimensional reduction
-print(paste("run PCA and ProjectDim"))
+log_info(paste("run PCA and ProjectDim"))
 seurat <- RunPCA(seurat, npcs = 40)
 seurat <- ProjectDim(object = seurat)
 
-print(paste("run ICA and ProjectDim"))
+log_info(paste("run ICA and ProjectDim"))
 seurat <- RunICA(seurat, nics = 40)
 seurat <- ProjectDim(object = seurat)
 
-
-print(paste("calculate distances between data"))
+log_info(paste("calculate distances between data"))
 d <- parDist(t(GetAssayData(seurat, slot = "scale.data")))
 
-print(paste("run CMD scaling"))
+log_info(paste("run CMD scaling"))
 mds <- cmdscale(d = d, k = 2)
 
-print(paste("create subobject with reduced dimensions"))
+log_info(paste("create subobject with reduced dimensions"))
 colnames(mds) <- paste0("MDS_", 1:2)
 seurat[["mds"]] <- CreateDimReducObject(embeddings = mds, key = "MDS_", assay = DefaultAssay(seurat))
 
@@ -36,26 +35,37 @@ seurat[["mds"]] <- CreateDimReducObject(embeddings = mds, key = "MDS_", assay = 
 print(seurat[["pca"]], dims = 1:5, nfeatures = 5)
 print(seurat[["ica"]], dims = 1:5, nfeatures = 5)
 
-print(paste("visialize Dim reduction - pca"))
-VizDimLoadings(seurat, dims = 1:2, reduction = "pca")
+log_info(paste("visialize Dim reduction - pca"))
+vdl1 <- VizDimLoadings(seurat, dims = 1:2, reduction = "pca")
+print(vdl1)
 
-print(paste("visialize Dim reduction - ica"))
-VizDimLoadings(seurat, dims = 1:2, reduction = "ica")
+log_info(paste("visialize Dim reduction - ica"))
+vdl2 <- VizDimLoadings(seurat, dims = 1:2, reduction = "ica")
+print(vdl2)
 
-print(paste("dim plot - pca"))
-DimPlot(seurat, reduction = "pca")
+log_info(paste("visialize Dim reduction - mds"))
+vdl3 <- VizDimLoadings(seurat, dims = 1:2, reduction = "mds")
+print(vdl3)
 
-print(paste("dim plot - ica"))
-DimPlot(seurat, reduction = "ica")
+log_info(paste("dim plot - pca"))
+dm1 <- DimPlot(seurat, reduction = "pca")
+print(dm1)
 
-print(paste("dim plot - mds"))
-DimPlot(seurat, reduction = "mds")
+log_info(paste("dim plot - ica"))
+dm2 <- DimPlot(seurat, reduction = "ica")
+print(dm2)
 
-print(paste("dim heatmap 1"))
-DimHeatmap(seurat, dims = 1, cells = 500, balanced = TRUE)
+log_info(paste("dim plot - mds"))
+dm3 <- DimPlot(seurat, reduction = "mds")
+print(dm3)
 
-print(paste("dim heatmap 2"))
-DimHeatmap(seurat, dims = 1:15, cells = 500, balanced = TRUE)
+log_info(paste("dim heatmap 1"))
+hm1 <- DimHeatmap(seurat, dims = 1, cells = 500, balanced = TRUE)
+print(hm1)
+
+log_info(paste("dim heatmap 2"))
+hm2 <- DimHeatmap(seurat, dims = 1:15, cells = 500, balanced = TRUE)
+print(hm2)
 
 # Determine the ‘dimensionality’ of the dataset
 seurat <- JackStraw(seurat, num.replicate = 100)
@@ -70,7 +80,8 @@ write.table(x = pc_pval,
             sep = "\t",
             col.names = TRUE);
 
-print(paste("jackstraw plot"))
-JackStrawPlot(seurat, dims = 1:15)
+log_info(paste("jackstraw plot"))
+jsp1 <- JackStrawPlot(seurat, dims = 1:15)
+print(jsp1)
 
 saveRDS(seurat, file = paste0(output_folder, "4-pca-jackstraw.rds"))
