@@ -11,9 +11,10 @@ if (!require("ggplot2")) {
 
 samples <- c("cap-ctrl", "covid-ctrl", "covid-cap")
 files <- c(
-  "./Data/Pneumonia/GSE164948_cap_control_RNA_counts.csv",
-  "./Data/Pneumonia/GSE164948_covid_control_RNA_counts.csv",
-  "./Data/Pneumonia/GSE164948_covid_cap_RNA_counts.csv"
+  "./Data/SARS-COV-2/Smokers/internal_smokerslung.expression.txt"
+  # "./Data/Pneumonia/GSE164948_cap_control_RNA_counts.csv",
+  # "./Data/Pneumonia/GSE164948_covid_control_RNA_counts.csv",
+  # "./Data/Pneumonia/GSE164948_covid_cap_RNA_counts.csv"
 )
 
 seurat_list <- list()
@@ -86,17 +87,13 @@ count_s <- sd(seurat@meta.data$nCount_RNA)
 count_q <- quantile(seurat@meta.data$nCount_RNA, 0.95)
 
 loginfo(paste("plot1 - percent.mt"))
-print_img(plot1
-+ geom_hline(yintercept = 5, color = "red"))
+print_img(plot1 + geom_hline(yintercept = 5, color = "red"))
 
 loginfo(paste("plot1 - percent.rb"))
-print_img(plot2
-+ geom_hline(yintercept = 5, color = "red"))
+print_img(plot2 + geom_hline(yintercept = 5, color = "red"))
 
 loginfo(paste("plot1 - nFeature_RNA"))
-print_img(plot3
-+ geom_hline(yintercept = 500, color = "red")
-  + geom_vline(xintercept = count_q, color = "red"))
+print_img(plot3 + geom_hline(yintercept = 500, color = "red") + geom_vline(xintercept = count_q, color = "red"))
 
 loginfo(paste("Feature stats:", feature_min, feature_m, feature_max, feature_s))
 loginfo(paste("UMI stats:", count_min, count_m, count_max, count_s, count_q))
