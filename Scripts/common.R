@@ -70,6 +70,18 @@ load_seurat <- function(filename, separator = ",", project = "seurat", min_cells
   }
 }
 
+print_img <- function(x) {
+  graphics.off()
+  print(x)
+  if ("rmote" %in% .packages(all.available = TRUE) && "rmote" %in% tolower((.packages()))) {
+    plot_done()
+  }
+}
+
+src1 <- function() {
+  return(source())
+}
+
 src2 <- function() {
   return(source("Scripts/2-data-loading.R"))
 }

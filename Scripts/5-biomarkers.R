@@ -39,35 +39,35 @@ dp1 <- DimPlot(object = seurat,
               reduction = "umap",
               split.by = "DataSet",
               pt.size = 0.1)
-print(dp1)
+print_img(dp1)
 
 loginfo(paste("dim plot - tsne"))
 dp2 <- DimPlot(object = seurat,
               reduction = "tsne",
               split.by = "DataSet",
               pt.size = 0.1)
-print(dp2)
+print_img(dp2)
 
 loginfo(paste("dim plot - pca"))
 dp3 <- DimPlot(object = seurat,
               reduction = "pca",
               split.by = "DataSet",
               pt.size = 0.1)
-print(dp3)
+print_img(dp3)
 
 loginfo(paste("dim plot - ica"))
 dp4 <- DimPlot(object = seurat,
               reduction = "ica",
               split.by = "DataSet",
               pt.size = 0.1)
-print(dp4)
+print_img(dp4)
 
 loginfo(paste("dim plot - mds"))
 dp5 <- DimPlot(object = seurat,
               reduction = "mds",
               split.by = "DataSet",
               pt.size = 0.1)
-print(dp5)
+print_img(dp5)
 
 # Finding differentially expressed features (cluster biomarkers)
 # find markers for every cluster compared to all remaining cells, report only the positive ones
@@ -89,7 +89,7 @@ loginfo(paste("violin plot - 1"))
 vln1 <- VlnPlot(seurat,
         features = markers$gene[1:2],
         split.by = "DataSet")
-print(vln1)
+print_img(vln1)
 
 loginfo(paste("violin plot - 2"))
 vln2 <- VlnPlot(seurat,
@@ -97,7 +97,7 @@ vln2 <- VlnPlot(seurat,
         slot = "counts",
         log = TRUE,
         split.by = "DataSet")
-print(vln2)
+print_img(vln2)
 
 loginfo(paste("feature plots - 1"))
 for (i in markers$gene) {
@@ -105,11 +105,11 @@ for (i in markers$gene) {
   px <- FeaturePlot(seurat,
               features = i,
               split.by = "DataSet")
-  print(px)
+  print_img(px)
 }
 
 seurat_markers %>%
   group_by(cluster) %>%
   top_n(n = 10, wt = avg_log2FC) -> top10
 hm1 <- DoHeatmap(seurat, features = top10$gene) + NoLegend()
-print(hm1)
+print_img(hm1)

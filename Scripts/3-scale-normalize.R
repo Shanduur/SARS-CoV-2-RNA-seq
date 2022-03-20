@@ -37,9 +37,9 @@ plot1 <- VariableFeaturePlot(seurat)
 plot2 <- LabelPoints(plot = plot1, points = top10, repel = TRUE)
 
 loginfo(paste("plot1+plot2 - VariableFeaturePlot"))
-print(plot1 + plot2)
+print_img(plot1 + plot2)
 
 loginfo(paste("plot2 - VariableFeaturePlot labeled"))
-print(plot2)
+print_img(plot2)
 
 saveRDS(seurat, file = paste0(output_folder, "3-scaled-normalized.rds"))

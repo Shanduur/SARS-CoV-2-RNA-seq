@@ -37,35 +37,35 @@ print(seurat[["ica"]], dims = 1:5, nfeatures = 5)
 
 loginfo(paste("visialize Dim reduction - pca"))
 vdl1 <- VizDimLoadings(seurat, dims = 1:2, reduction = "pca")
-print(vdl1)
+print_img(vdl1)
 
 loginfo(paste("visialize Dim reduction - ica"))
 vdl2 <- VizDimLoadings(seurat, dims = 1:2, reduction = "ica")
-print(vdl2)
+print_img(vdl2)
 
 loginfo(paste("visialize Dim reduction - mds"))
 vdl3 <- VizDimLoadings(seurat, dims = 1:2, reduction = "mds")
-print(vdl3)
+print_img(vdl3)
 
 loginfo(paste("dim plot - pca"))
 dm1 <- DimPlot(seurat, reduction = "pca")
-print(dm1)
+print_img(dm1)
 
 loginfo(paste("dim plot - ica"))
 dm2 <- DimPlot(seurat, reduction = "ica")
-print(dm2)
+print_img(dm2)
 
 loginfo(paste("dim plot - mds"))
 dm3 <- DimPlot(seurat, reduction = "mds")
-print(dm3)
+print_img(dm3)
 
 loginfo(paste("dim heatmap 1"))
 hm1 <- DimHeatmap(seurat, dims = 1, cells = 500, balanced = TRUE)
-print(hm1)
+print_img(hm1)
 
 loginfo(paste("dim heatmap 2"))
 hm2 <- DimHeatmap(seurat, dims = 1:15, cells = 500, balanced = TRUE)
-print(hm2)
+print_img(hm2)
 
 # Determine the ‘dimensionality’ of the dataset
 seurat <- JackStraw(seurat, num.replicate = 100)
@@ -82,6 +82,6 @@ write.table(x = pc_pval,
 
 loginfo(paste("jackstraw plot"))
 jsp1 <- JackStrawPlot(seurat, dims = 1:15)
-print(jsp1)
+print_img(jsp1)
 
 saveRDS(seurat, file = paste0(output_folder, "4-pca-jackstraw.rds"))
