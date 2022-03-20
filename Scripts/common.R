@@ -73,8 +73,10 @@ load_seurat <- function(filename, separator = ",", project = "seurat", min_cells
 print_img <- function(x) {
   graphics.off()
   print(x)
-  if ("rmote" %in% .packages(all.available = TRUE) && "rmote" %in% tolower((.packages()))) {
-    plot_done()
+  if ("rmote" %in% .packages(all.available = TRUE)) {
+    if (rmote:::is_rmote_started()) {
+      rmote::plot_done()
+    }
   }
 }
 
