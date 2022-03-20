@@ -5,6 +5,11 @@ if (!require("Seurat")) {
   library(Seurat)
 }
 
+if (!require("parallelDist")) {
+  install.packages("parallelDist")
+  library(parallelDist)
+}
+
 seurat <- readRDS(file = paste0(output_folder, "3-scaled-normalized.rds"))
 
 # Performing linear dimensional reduction
@@ -18,7 +23,7 @@ seurat <- ProjectDim(object = seurat)
 
 
 print(paste("calculate distances between data"))
-d <- dist(t(GetAssayData(seurat, slot = "scale.data")))
+d <- parDist(t(GetAssayData(seurat, slot = "scale.data")))
 
 print(paste("run CMD scaling"))
 mds <- cmdscale(d = d, k = 2)
