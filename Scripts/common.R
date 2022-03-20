@@ -81,7 +81,7 @@ print_img <- function(x) {
 }
 
 src1 <- function() {
-  return(source())
+  return(source("Scripts/1-start-rmote.R"))
 }
 
 src2 <- function() {
