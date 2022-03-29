@@ -1,7 +1,7 @@
 source("./Scripts/common.R")
 
 # device <- "pdf"
-device <- NA
+device <- NULL
 
 if (!require("Seurat")) {
   install.packages("Seurat")
@@ -19,13 +19,20 @@ files <- c(
   "./Data/Pneumonia/GSE164948_covid_cap_RNA_counts.csv"
 )
 
+meta <- c(
+  "./Data/Pneumonia/GSE164948_cap_control_count_metadata.csv",
+  "./Data/Pneumonia/GSE164948_covid_control_count_metadata.csv",
+  "./Data/Pneumonia/GSE164948_covid_cap_count_metadata.csv"
+)
+
 seurat_list <- list()
 
 for (i in 1:length(files)) {
-  loginfo(paste("loading file:", files[i]))
+  loginfo(paste("loading file:", files[i], "|", meta[i]))
   seurat_list[[i]] <- load_seurat(
     filename = files[i],
-    project = samples[i]
+    project = samples[i],
+    meta = meta[i]
   )
   seurat_list[[i]][["DataSet"]] <- samples[i]
 }
@@ -71,7 +78,7 @@ print_img(table(seurat[["nCount_RNA"]]),
 loginfo(paste("violin plot 1"))
 vln1 <- VlnPlot(seurat,
   features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb"),
-  ncol = 3,
+  ncol = 2,
   pt.size = 0.001
 )
 print_img(vln1,
@@ -81,7 +88,7 @@ print_img(vln1,
 loginfo(paste("violin plot 2"))
 vln2 <- VlnPlot(seurat,
   features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb"),
-  ncol = 3,
+  ncol = 2,
   pt.size = 0
 )
 print_img(vln2,

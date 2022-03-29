@@ -1,6 +1,7 @@
 # rm(list = ls())
 
 output_folder <- "./Data/Output/"
+export_folder <- "./Data/Exported/"
 
 device <- "pdf"
 
@@ -46,11 +47,11 @@ colSumHist <- function(x) {
 }
 
 print_img <- function(x,
-                      fun = NA,
+                      fun = NULL,
                       width = 11,
                       height = 8,
-                      title = NA,
-                      device = NA,
+                      title = NULL,
+                      device = NULL,
                       output_folder = "./Data/Output/") {
   envRmote <- FALSE
   if ("rmote" %in% .packages(all.available = TRUE)) {
@@ -62,7 +63,7 @@ print_img <- function(x,
     }
   }
   
-  if (is.na(title)) {
+  if (is.null(title)) {
     title <- format(Sys.time(), "%s")
   }
   title <- basename(title)
@@ -70,7 +71,7 @@ print_img <- function(x,
 
   graphics.off()
 
-  if (!is.na(device)) {
+  if (!is.null(device)) {
     if (device == "pdf") {
       grDev <- pdf
     } else if (device == "jpeg") {
@@ -84,13 +85,13 @@ print_img <- function(x,
           height = height)
   }
 
-  if (is.na(fun)) {
+  if (is.null(fun)) {
     print(x)
   } else {
     fun(x)
   }
 
-  if (!is.na(device)) {
+  if (!is.null(device)) {
     dev.off()
   }
 
@@ -99,12 +100,25 @@ print_img <- function(x,
   }
 }
 
-load_counts <- function(filename, separator, project, min_cells, min_features) {
+load_counts <- function(filename,
+                        meta,
+                        separator,
+                        meta_separator,
+                        project,
+                        min_cells,
+                        min_features) {
   raw_data <- read.table(file = filename, sep = separator)
+  if (!is.null(meta)) {
+    raw_meta <- read.table(meta, header = TRUE, sep = meta_separator)
+  } else {
+    raw_meta <- NULL
+  }
   print_img(raw_data, fun = colSumHist, device = device, title = paste0("histogram", filename))
+  
   seurat_object <- CreateSeuratObject(counts = raw_data,
                                       min.cells = min_cells,
                                       min.features = min_features,
+                                      meta.data = raw_meta,
                                       project = project)
   return(seurat_object)
 }
@@ -114,7 +128,9 @@ load_hdf5 <- function(filename,
                       min_cells,
                       min_features) {
   raw_data <- Read10X_h5(file)
+
   print_img(raw_data, fun = colSumHist, device = device, title = paste0("histogram", filename))
+
   seurat_object <- CreateSeuratObject(counts = raw_data,
                                       min.cells = min_cells,
                                       min.features = min_features,
@@ -123,7 +139,9 @@ load_hdf5 <- function(filename,
 }
 
 load_seurat <- function(filename,
+                        meta = NULL,
                         separator = FALSE,
+                        meta_separator = ",",
                         project = "seurat",
                         min_cells = 100,
                         min_features = 500) {
@@ -151,7 +169,9 @@ load_seurat <- function(filename,
     }
 
     return(load_counts(filename = filename,
+                       meta = meta,
                        separator = sep,
+                       meta_separator = meta_separator,
                        project = project,
                        min_cells = min_cells,
                        min_features = min_features))

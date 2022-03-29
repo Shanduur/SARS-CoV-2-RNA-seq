@@ -12,6 +12,13 @@ if (!require("parallelDist")) {
 
 seurat <- readRDS(file = paste0(output_folder, "3-scaled-normalized.rds"))
 
+# selekcja cech ze względu na wariancje
+# model składowych gausowskich
+# pierwszy komponent
+# Gamred
+# SNN
+# mclust
+
 # Performing linear dimensional reduction
 loginfo(paste("run PCA and ProjectDim"))
 seurat <- RunPCA(seurat, npcs = 40)
@@ -21,15 +28,15 @@ loginfo(paste("run ICA and ProjectDim"))
 seurat <- RunICA(seurat, nics = 40)
 seurat <- ProjectDim(object = seurat)
 
-loginfo(paste("calculate distances between data"))
-d <- parDist(t(GetAssayData(seurat, slot = "scale.data")))
-
-loginfo(paste("run CMD scaling"))
-mds <- cmdscale(d = d, k = 2)
-
-loginfo(paste("create subobject with reduced dimensions"))
-colnames(mds) <- paste0("MDS_", 1:2)
-seurat[["mds"]] <- CreateDimReducObject(embeddings = mds, key = "MDS_", assay = DefaultAssay(seurat))
+# loginfo(paste("calculate distances between data"))
+# d <- parDist(t(GetAssayData(seurat, slot = "scale.data")))
+# 
+# loginfo(paste("run CMD scaling"))
+# mds <- cmdscale(d = d, k = 2)
+# 
+# loginfo(paste("create subobject with reduced dimensions"))
+# colnames(mds) <- paste0("MDS_", 1:2)
+# seurat[["mds"]] <- CreateDimReducObject(embeddings = mds, key = "MDS_", assay = DefaultAssay(seurat))
 
 # Examine and visualize PCA results a few different ways
 print(seurat[["pca"]], dims = 1:5, nfeatures = 5)

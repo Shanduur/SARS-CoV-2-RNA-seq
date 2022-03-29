@@ -9,10 +9,23 @@ if (!require("ggplot2")) {
   library(ggplot2)
 }
 
+if (!require("mclust")) {
+  install.packages("mclust")
+  library(mclust)
+}
+
 seurat <- readRDS(file = paste0(output_folder, "2-loaded.rds"))
 
 # Normalizing the data
 seurat <- NormalizeData(seurat, normalization.method = "LogNormalize", scale.factor = 1e4)
+
+loginfo("exporting data to file")
+write.table(as.matrix(GetAssayData(object = seurat, slot = "counts")),
+            paste0(export_folder, "log-normalized.txt"),
+            sep = '\t',
+            row.names = TRUE,
+            col.names = TRUE,
+            quote = TRUE)
 
 # calculating a subset of features that exhibit high cell-to-cell variation in the dataset
 # próg powinien zostać dobrany w inny sposób, np. modelowanie (mieszanie rozkładów normalnych)
@@ -28,9 +41,18 @@ loginfo(paste("Top 10 most highly variable genes:", toString(top10)))
 # - Shifts the expression of each gene, so that the mean expression across cells is 0
 # - Scales the expression of each gene, so that the variance across cells is 1
 #   - This step gives equal weight in downstream analyses, so that highly-expressed genes do not dominate
+loginfo("scaling data")
 seurat <- ScaleData(object = seurat,
                     features = rownames(x = seurat),
                     verbose = FALSE);
+
+loginfo("exporting data to file")
+write.table(as.matrix(GetAssayData(object = seurat, slot = "counts")),
+            paste0(export_folder, "scaled-log-normalized.txt"),
+            sep = '\t',
+            row.names = TRUE,
+            col.names = TRUE,
+            quote = TRUE)
 
 # plot variable features with and without labels to identify the 10 most highly variable genes
 plot1 <- VariableFeaturePlot(seurat)
