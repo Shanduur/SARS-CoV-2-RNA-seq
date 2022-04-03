@@ -1,7 +1,7 @@
 source("./Scripts/common.R")
 
-device <- "pdf"
-# device <- NULL
+# device <- "pdf"
+device <- NULL
 
 if (!require("Seurat")) {
   install.packages("Seurat")
@@ -13,23 +13,23 @@ if (!require("ggplot2")) {
 }
 
 samples <- c(
-  # "fibrosis-01",
-  # "fibrosis-02"
+  "fibrosis-01",
+  "fibrosis-02",
+  "non-smokers",
   "smokers",
-  "non-smokers"
-  # "cap-ctrl",
-  # "covid-ctrl",
-  # "covid-cap"
+  "cap-ctrl",
+  "covid-ctrl",
+  "covid-cap"
   )
 
 files <- c(
-  # "./Data/Fibrosis/Filtred/GSM3489183_IPF_01_filtered_gene_bc_matrices_h5.h5",
-  # "./Data/Fibrosis/Filtred/GSM3489184_IPF_02_filtered_gene_bc_matrices_h5.h5"
+  "./Data/Fibrosis/Filtred/GSM3489183_IPF_01_filtered_gene_bc_matrices_h5.h5",
+  "./Data/Fibrosis/Filtred/GSM3489184_IPF_02_filtered_gene_bc_matrices_h5.h5",
   "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.expression.csv",
-  "./Data/SARS-COV-2/Smokers/internal_smokerslung.expression.csv"
-  # "./Data/Pneumonia/GSE164948_cap_control_RNA_counts.csv",
-  # "./Data/Pneumonia/GSE164948_covid_control_RNA_counts.csv",
-  # "./Data/Pneumonia/GSE164948_covid_cap_RNA_counts.csv"
+  "./Data/SARS-COV-2/Smokers/internal_smokerslung.expression.csv",
+  "./Data/Pneumonia/GSE164948_cap_control_RNA_counts.csv",
+  "./Data/Pneumonia/GSE164948_covid_control_RNA_counts.csv",
+  "./Data/Pneumonia/GSE164948_covid_cap_RNA_counts.csv"
 )
 
 for (i in 1:length(files)) {
@@ -41,13 +41,13 @@ for (i in 1:length(files)) {
 }
 
 meta <- c(
-  # NULL,
-  # NULL
-  "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.meta.txt",
-  "./Data/SARS-COV-2/Smokers/internal_smokerslung.meta.txt"
-  # "./Data/Pneumonia/GSE164948_cap_control_count_metadata.csv",
-  # "./Data/Pneumonia/GSE164948_covid_control_count_metadata.csv",
-  # "./Data/Pneumonia/GSE164948_covid_cap_count_metadata.csv"
+  NULL,
+  NULL,
+  "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.meta.csv",
+  "./Data/SARS-COV-2/Smokers/internal_smokerslung.meta.csv",
+  "./Data/Pneumonia/GSE164948_cap_control_count_metadata.csv",
+  "./Data/Pneumonia/GSE164948_covid_control_count_metadata.csv",
+  "./Data/Pneumonia/GSE164948_covid_cap_count_metadata.csv"
 )
 
 for (i in 1:length(meta)) {
@@ -61,9 +61,8 @@ for (i in 1:length(meta)) {
 }
 
 seurat_list <- list()
-
 for (i in 1:length(files)) {
-  loginfo(paste("loading file:", files[i], "|", meta[i]))
+  loginfo(paste("loading file", paste0(i, ":"), files[i], "|", meta[i]))
   seurat_list[[i]] <- load_seurat(
     filename = files[i],
     project = samples[i],

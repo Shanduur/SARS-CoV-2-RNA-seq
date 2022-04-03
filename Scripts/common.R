@@ -31,6 +31,10 @@ if (!dir.exists(checkpoint_folder)) {
 
 device <- "pdf"
 
+if (!require("hms")) {
+  install.packages("hms")
+  library(hms)
+}
 if (!require("Seurat")) {
   install.packages("Seurat")
   library(Seurat)
@@ -59,6 +63,13 @@ if (!require("stringi")) {
   install.packages("stringi")
   library(stringi)
 }
+if (!require("BiocManager")) {
+  install.packages("BiocManager")
+  BiocManager::install()
+}
+
+install.packages('BiocManager')
+BiocManager::install('limma')
 
 col_sum_hist <- function(x) {
   hist(colSums(x),
@@ -134,7 +145,7 @@ load_counts <- function(filename,
   time_start <- Sys.time()
   raw_data <- read.table(file = filename, sep = separator, quote = quote)
   time_end <- Sys.time()
-  loginfo(paste("loading expression matrix took", time_start - time_end))
+  loginfo(paste("loading expression matrix took", as_hms(time_end - time_start)))
 
   if (!is.null(meta)) {
     loginfo("loading raw metadata")
@@ -181,7 +192,7 @@ load_seurat <- function(filename,
                         meta_separator = ",",
                         project = "seurat",
                         min_cells = 100,
-                        min_features = 500,
+                        min_features = 10,
                         quote = "\"'") {
   if (grepl(".h5", filename, fixed = TRUE)) {
     loginfo(paste("loading hdf5 file"))
