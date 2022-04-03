@@ -2,6 +2,7 @@
 
 output_folder <- "./Data/Output/"
 export_folder <- "./Data/Exported/"
+checkpoint_folder <- "./Data/Checkpoints/"
 
 device <- "pdf"
 
@@ -105,11 +106,12 @@ load_counts <- function(filename,
                         separator,
                         meta_separator,
                         project,
+                        quote,
                         min_cells,
                         min_features) {
-  raw_data <- read.table(file = filename, sep = separator)
+  raw_data <- read.table(file = filename, sep = separator, quote = quote)
   if (!is.null(meta)) {
-    raw_meta <- read.table(meta, header = TRUE, sep = meta_separator)
+    raw_meta <- read.table(meta, header = TRUE, sep = meta_separator, quote = quote)
   } else {
     raw_meta <- NULL
   }
@@ -144,7 +146,8 @@ load_seurat <- function(filename,
                         meta_separator = ",",
                         project = "seurat",
                         min_cells = 100,
-                        min_features = 500) {
+                        min_features = 500,
+                        quote = "\"'") {
   if (grepl(".h5", filename, fixed = TRUE)) {
     loginfo(paste("loading hdf5 file"))
 
@@ -174,7 +177,8 @@ load_seurat <- function(filename,
                        meta_separator = meta_separator,
                        project = project,
                        min_cells = min_cells,
-                       min_features = min_features))
+                       min_features = min_features,
+                       quote = quote))
   }
 }
 

@@ -1,7 +1,7 @@
 source("./Scripts/common.R")
 
-# device <- "pdf"
-device <- NULL
+device <- "pdf"
+# device <- NULL
 
 if (!require("Seurat")) {
   install.packages("Seurat")
@@ -12,17 +12,22 @@ if (!require("ggplot2")) {
   library(ggplot2)
 }
 
-samples <- c("cap-ctrl", "covid-ctrl", "covid-cap")
+# samples <- c("cap-ctrl", "covid-ctrl", "covid-cap")
+samples <- c("smokers", "non-smokers")
 files <- c(
-  "./Data/Pneumonia/GSE164948_cap_control_RNA_counts.csv",
-  "./Data/Pneumonia/GSE164948_covid_control_RNA_counts.csv",
-  "./Data/Pneumonia/GSE164948_covid_cap_RNA_counts.csv"
+  "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.expression.txt",
+  "./Data/SARS-COV-2/Smokers/internal_smokerslung.expression.txt"
+  # "./Data/Pneumonia/GSE164948_cap_control_RNA_counts.csv",
+  # "./Data/Pneumonia/GSE164948_covid_control_RNA_counts.csv",
+  # "./Data/Pneumonia/GSE164948_covid_cap_RNA_counts.csv"
 )
 
 meta <- c(
-  "./Data/Pneumonia/GSE164948_cap_control_count_metadata.csv",
-  "./Data/Pneumonia/GSE164948_covid_control_count_metadata.csv",
-  "./Data/Pneumonia/GSE164948_covid_cap_count_metadata.csv"
+  "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.meta.txt",
+  "./Data/SARS-COV-2/Smokers/internal_smokerslung.meta.txt"
+  # "./Data/Pneumonia/GSE164948_cap_control_count_metadata.csv",
+  # "./Data/Pneumonia/GSE164948_covid_control_count_metadata.csv",
+  # "./Data/Pneumonia/GSE164948_covid_cap_count_metadata.csv"
 )
 
 seurat_list <- list()
@@ -32,7 +37,8 @@ for (i in 1:length(files)) {
   seurat_list[[i]] <- load_seurat(
     filename = files[i],
     project = samples[i],
-    meta = meta[i]
+    meta = meta[i],
+    meta_separator = '\t'
   )
   seurat_list[[i]][["DataSet"]] <- samples[i]
 }
@@ -40,7 +46,7 @@ for (i in 1:length(files)) {
 loginfo(paste("building seurat object"))
 seurat <- merge(
   x = seurat_list[[1]],
-  y = c(seurat_list[[2]], seurat_list[[3]]),
+  y = unlist(seurat_list)[2:length(seurat_list)],
   add.cell.ids = samples,
   project = "SARS-CoV-2-RNA-seq"
 )
@@ -53,7 +59,7 @@ head(seurat[["percent.mt"]], n = 20)
 loginfo(paste("histogram 1: nFeature_RNA"))
 print_img(table(seurat[["nFeature_RNA"]]),
           fun = hist,
-          title = nFeature_RNA,
+          title = "nFeature_RNA",
           device = device)
 
 loginfo(paste("histogram 2: percent.mt"))
@@ -113,7 +119,7 @@ count_q <- quantile(seurat@meta.data$nCount_RNA, 0.95)
 
 loginfo(paste("plot1 - percent.mt"))
 print_img(plot1 + geom_hline(yintercept = 5, color = "red"),
-          title = "plot1 - percent.mt",
+          title = "plot1-percent.mt",
           device = device)
 
 loginfo(paste("plot2 - percent.rb"))
@@ -125,12 +131,12 @@ loginfo(paste("plot3 - nFeature_RNA"))
 print_img(plot3 +
             geom_hline(yintercept = 500, color = "red") +
             geom_vline(xintercept = count_q, color = "red"),
-          title = "plot3 - nFeature_RNA",
+          title = "plot3-nFeature_RNA",
           device = device)
 
 loginfo(paste("Feature stats:", feature_min, feature_m, feature_max, feature_s))
 loginfo(paste("UMI stats:", count_min, count_m, count_max, count_s, count_q))
 seurat <- subset(seurat, subset = nFeature_RNA > 500 & nCount_RNA < count_q & percent.mt < 5)
 
-saveRDS(seurat, file = paste0(output_folder, "2-loaded.rds"))
+saveRDS(seurat, file = paste0(checkpoint_folder, "2-loaded.rds"))
 rm(seurat_list)
