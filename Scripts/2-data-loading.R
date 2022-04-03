@@ -12,18 +12,33 @@ if (!require("ggplot2")) {
   library(ggplot2)
 }
 
-samples <- c("fibrosis-01", "fibrosis-02")
-samples <- c("smokers", "non-smokers")
-# samples <- c("cap-ctrl", "covid-ctrl", "covid-cap")
+samples <- c(
+  # "fibrosis-01",
+  # "fibrosis-02"
+  "smokers",
+  "non-smokers"
+  # "cap-ctrl",
+  # "covid-ctrl",
+  # "covid-cap"
+  )
+
 files <- c(
   # "./Data/Fibrosis/Filtred/GSM3489183_IPF_01_filtered_gene_bc_matrices_h5.h5",
   # "./Data/Fibrosis/Filtred/GSM3489184_IPF_02_filtered_gene_bc_matrices_h5.h5"
-  "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.expression.txt",
-  "./Data/SARS-COV-2/Smokers/internal_smokerslung.expression.txt"
+  "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.expression.csv",
+  "./Data/SARS-COV-2/Smokers/internal_smokerslung.expression.csv"
   # "./Data/Pneumonia/GSE164948_cap_control_RNA_counts.csv",
   # "./Data/Pneumonia/GSE164948_covid_control_RNA_counts.csv",
   # "./Data/Pneumonia/GSE164948_covid_cap_RNA_counts.csv"
 )
+
+for (i in 1:length(files)) {
+  if (!file.exists(files[i])) {
+    logerror(paste("data file", files[i], "does not exist!"))
+  } else {
+    loginfo(paste("data file location", files[i], "ok"))
+  }
+}
 
 meta <- c(
   # NULL,
@@ -35,6 +50,16 @@ meta <- c(
   # "./Data/Pneumonia/GSE164948_covid_cap_count_metadata.csv"
 )
 
+for (i in 1:length(meta)) {
+  if (!is.null(meta[i]) && !file.exists(meta[i])) {
+    logerror(paste("meta file", meta[i], "does not exist!"))
+  } else if (!is.null(meta[i]) && file.exists(meta[i])) {
+    loginfo(paste("meta file location", files[i], "ok"))
+  } else if (is.null(meta[i])) {
+    logwarn("meta file location not privided")
+  }
+}
+
 seurat_list <- list()
 
 for (i in 1:length(files)) {
@@ -43,7 +68,7 @@ for (i in 1:length(files)) {
     filename = files[i],
     project = samples[i],
     meta = meta[i],
-    meta_separator = '\t'
+    meta_separator = "\t"
   )
   seurat_list[[i]][["DataSet"]] <- samples[i]
 }

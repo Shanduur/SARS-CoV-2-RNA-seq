@@ -86,7 +86,7 @@ print_img(dp4,
 # find markers for every cluster compared to all remaining cells, report only the positive ones
 seurat_markers <- FindAllMarkers(seurat,
   only.pos = TRUE,
-  min.pct = 0.1, # only test genes that are detected in a minimum 
+  min.pct = 0.1, # only test genes that are detected in a minimum
                  # fraction of min.pct cells in either of the two populations
   logfc.threshold = 0.25 # default value
 )

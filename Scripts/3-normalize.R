@@ -36,7 +36,7 @@ print_img(column_variances,
 loginfo("exporting table of column variances to file")
 write.table(column_variances,
             paste0(export_folder, "variances.data.txt"),
-            sep = '\t',
+            sep = "\t",
             row.names = TRUE,
             col.names = TRUE,
             quote = FALSE)

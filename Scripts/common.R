@@ -6,7 +6,7 @@ if (!require("logging")) {
 }
 
 output_folder <- "./Data/Output/"
-if (!dir.exists(output_folder)){
+if (!dir.exists(output_folder)) {
   loginfo(paste("creating", output_folder))
   dir.create(output_folder)
 } else {
@@ -14,7 +14,7 @@ if (!dir.exists(output_folder)){
 }
 
 export_folder <- "./Data/Exported/"
-if (!dir.exists(export_folder)){
+if (!dir.exists(export_folder)) {
   loginfo(paste("creating", export_folder))
   dir.create(export_folder)
 } else {
@@ -22,7 +22,7 @@ if (!dir.exists(export_folder)){
 }
 
 checkpoint_folder <- "./Data/Checkpoints/"
-if (!dir.exists(checkpoint_folder)){
+if (!dir.exists(checkpoint_folder)) {
   loginfo(paste("creating", checkpoint_folder))
   dir.create(checkpoint_folder)
 } else {
@@ -60,7 +60,7 @@ if (!require("stringi")) {
   library(stringi)
 }
 
-colSumHist <- function(x) {
+col_sum_hist <- function(x) {
   hist(colSums(x),
     breaks = 100,
     main = "Expression sum per cell",
@@ -75,16 +75,16 @@ print_img <- function(x,
                       title = NULL,
                       device = NULL,
                       output_folder = "./Data/Output/") {
-  envRmote <- FALSE
+  env_rmote <- FALSE
   if ("rmote" %in% .packages(all.available = TRUE)) {
     if (rmote:::is_rmote_on()) {
       logwarn("rmote environment active, all printing is piped to rmote")
 
-      envRmote <- TRUE
+      env_rmote <- TRUE
       device <- NA
     }
   }
-  
+
   if (is.null(title)) {
     title <- format(Sys.time(), "%s")
   }
@@ -95,14 +95,14 @@ print_img <- function(x,
 
   if (!is.null(device)) {
     if (device == "pdf") {
-      grDev <- pdf
+      graphics_device <- pdf
     } else if (device == "jpeg") {
-      grDev <- jpeg
+      graphics_device <- jpeg
     } else if (device == "png") {
-      grDev <- png
+      graphics_device <- png
     }
 
-    grDev(file = file.path(output_folder, paste0(title, ".", device)),
+    graphics_device(file = file.path(output_folder, paste0(title, ".", device)),
           width = width,
           height = height)
   }
@@ -117,7 +117,7 @@ print_img <- function(x,
     dev.off()
   }
 
-  if (envRmote) {
+  if (env_rmote) {
     rmote::plot_done()
   }
 }
@@ -131,7 +131,11 @@ load_counts <- function(filename,
                         min_cells,
                         min_features) {
   loginfo("loading raw expression matrix")
+  time_start <- Sys.time()
   raw_data <- read.table(file = filename, sep = separator, quote = quote)
+  time_end <- Sys.time()
+  loginfo(paste("loading expression matrix took", time_start - time_end))
+
   if (!is.null(meta)) {
     loginfo("loading raw metadata")
     raw_meta <- read.table(meta, header = TRUE, sep = meta_separator, quote = quote)
@@ -140,7 +144,7 @@ load_counts <- function(filename,
   }
 
   loginfo("printing histogram")
-  print_img(raw_data, fun = colSumHist, device = device, title = paste0("histogram", filename))
+  print_img(raw_data, fun = col_sum_hist, device = device, title = paste0("histogram", filename))
   
   loginfo("creating seurat object")
   seurat_object <- CreateSeuratObject(counts = raw_data,
@@ -160,7 +164,7 @@ load_hdf5 <- function(filename,
   raw_data <- Read10X_h5(filename = filename)
 
   loginfo("printing histogram (h5)")
-  print_img(raw_data, fun = colSumHist, device = device, title = paste0("histogram", filename))
+  print_img(raw_data, fun = col_sum_hist, device = device, title = paste0("histogram", filename))
 
   loginfo("creating seurat object (h5)")
   seurat_object <- CreateSeuratObject(counts = raw_data,

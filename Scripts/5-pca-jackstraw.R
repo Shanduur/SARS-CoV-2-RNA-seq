@@ -30,10 +30,10 @@ seurat <- ProjectDim(object = seurat)
 
 # loginfo(paste("calculate distances between data"))
 # d <- parDist(t(GetAssayData(seurat, slot = "scale.data")))
-# 
+#
 # loginfo(paste("run CMD scaling"))
 # mds <- cmdscale(d = d, k = 2)
-# 
+#
 # loginfo(paste("create subobject with reduced dimensions"))
 # colnames(mds) <- paste0("MDS_", 1:2)
 # seurat[["mds"]] <- CreateDimReducObject(embeddings = mds, key = "MDS_", assay = DefaultAssay(seurat))
