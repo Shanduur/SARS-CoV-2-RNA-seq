@@ -203,3 +203,5 @@ vignettes/*.pdf
 
 *.h5
 *.csv
+
+nohup.out

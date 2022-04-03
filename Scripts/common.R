@@ -68,8 +68,8 @@ if (!require("BiocManager")) {
   BiocManager::install()
 }
 
-install.packages('BiocManager')
-BiocManager::install('limma')
+install.packages("BiocManager")
+BiocManager::install("limma")
 
 col_sum_hist <- function(x) {
   hist(colSums(x),
