@@ -12,9 +12,12 @@ if (!require("ggplot2")) {
   library(ggplot2)
 }
 
-# samples <- c("cap-ctrl", "covid-ctrl", "covid-cap")
+samples <- c("fibrosis-01", "fibrosis-02")
 samples <- c("smokers", "non-smokers")
+# samples <- c("cap-ctrl", "covid-ctrl", "covid-cap")
 files <- c(
+  # "./Data/Fibrosis/Filtred/GSM3489183_IPF_01_filtered_gene_bc_matrices_h5.h5",
+  # "./Data/Fibrosis/Filtred/GSM3489184_IPF_02_filtered_gene_bc_matrices_h5.h5"
   "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.expression.txt",
   "./Data/SARS-COV-2/Smokers/internal_smokerslung.expression.txt"
   # "./Data/Pneumonia/GSE164948_cap_control_RNA_counts.csv",
@@ -23,6 +26,8 @@ files <- c(
 )
 
 meta <- c(
+  # NULL,
+  # NULL
   "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.meta.txt",
   "./Data/SARS-COV-2/Smokers/internal_smokerslung.meta.txt"
   # "./Data/Pneumonia/GSE164948_cap_control_count_metadata.csv",

@@ -1,8 +1,33 @@
 # rm(list = ls())
 
+if (!require("logging")) {
+  install.packages("logging")
+  library(logging)
+}
+
 output_folder <- "./Data/Output/"
+if (!dir.exists(output_folder)){
+  loginfo(paste("creating", output_folder))
+  dir.create(output_folder)
+} else {
+  loginfo(paste(output_folder, "already exists"))
+}
+
 export_folder <- "./Data/Exported/"
+if (!dir.exists(export_folder)){
+  loginfo(paste("creating", export_folder))
+  dir.create(export_folder)
+} else {
+  loginfo(paste(export_folder, "already exists"))
+}
+
 checkpoint_folder <- "./Data/Checkpoints/"
+if (!dir.exists(checkpoint_folder)){
+  loginfo(paste("creating", checkpoint_folder))
+  dir.create(checkpoint_folder)
+} else {
+  loginfo(paste(checkpoint_folder, "already exists"))
+}
 
 device <- "pdf"
 
@@ -25,10 +50,6 @@ if (!require("dplyr")) {
 if (!require("Matrix")) {
   install.packages("Matrix")
   library(Matrix)
-}
-if (!require("logging")) {
-  install.packages("logging")
-  library(logging)
 }
 if (!require("stringr")) {
   install.packages("stringr")
@@ -109,19 +130,25 @@ load_counts <- function(filename,
                         quote,
                         min_cells,
                         min_features) {
+  loginfo("loading raw expression matrix")
   raw_data <- read.table(file = filename, sep = separator, quote = quote)
   if (!is.null(meta)) {
+    loginfo("loading raw metadata")
     raw_meta <- read.table(meta, header = TRUE, sep = meta_separator, quote = quote)
   } else {
     raw_meta <- NULL
   }
+
+  loginfo("printing histogram")
   print_img(raw_data, fun = colSumHist, device = device, title = paste0("histogram", filename))
   
+  loginfo("creating seurat object")
   seurat_object <- CreateSeuratObject(counts = raw_data,
                                       min.cells = min_cells,
                                       min.features = min_features,
                                       meta.data = raw_meta,
                                       project = project)
+  loginfo("load_counts done!")
   return(seurat_object)
 }
 
@@ -129,14 +156,18 @@ load_hdf5 <- function(filename,
                       project,
                       min_cells,
                       min_features) {
-  raw_data <- Read10X_h5(file)
+  loginfo(paste("loading expression matrix (h5)", filename))
+  raw_data <- Read10X_h5(filename = filename)
 
+  loginfo("printing histogram (h5)")
   print_img(raw_data, fun = colSumHist, device = device, title = paste0("histogram", filename))
 
+  loginfo("creating seurat object (h5)")
   seurat_object <- CreateSeuratObject(counts = raw_data,
                                       min.cells = min_cells,
                                       min.features = min_features,
                                       project = project)
+  loginfo("load_hdf5 done!")
   return(seurat_object)
 }
 
