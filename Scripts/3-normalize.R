@@ -1,5 +1,6 @@
 source("./Scripts/common.R")
 
+prefix <- "03"
 device <- "pdf"
 # device <- NULL
 
@@ -29,7 +30,8 @@ column_variances <- colVars(as.matrix(GetAssayData(object = seurat, slot = "data
 loginfo("printing histogram of variances")
 print_img(column_variances,
           fun = hist,
-          title = "02-column-variances",
+          prefix = prefix,
+          title = "column-variances",
           device = device)
 
 # wektor wariancji eksportujemy (wyliczony ze znormalizowanych danych)

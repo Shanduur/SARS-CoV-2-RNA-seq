@@ -1,5 +1,6 @@
 source("./Scripts/common.R")
 
+prefix <- "06"
 device <- "pdf"
 # device <- NULL
 
@@ -43,7 +44,8 @@ dp1 <- DimPlot(object = seurat,
               split.by = "DataSet",
               pt.size = 0.1)
 print_img(dp1,
-          title = "06-dim-UMAP",
+          prefix = prefix,
+          title = "dim-UMAP",
           device = device,
           width = 25)
 
@@ -53,7 +55,8 @@ dp2 <- DimPlot(object = seurat,
               split.by = "DataSet",
               pt.size = 0.1)
 print_img(dp2,
-          title = "06-dim-TSNE",
+          prefix = prefix,
+          title = "dim-TSNE",
           device = device,
           width = 25)
 
@@ -63,7 +66,8 @@ dp3 <- DimPlot(object = seurat,
               split.by = "DataSet",
               pt.size = 0.1)
 print_img(dp3,
-          title = "06-dim-PCA",
+          prefix = prefix,
+          title = "dim-PCA",
           device = device,
           width = 25)
 
@@ -73,7 +77,8 @@ dp4 <- DimPlot(object = seurat,
               split.by = "DataSet",
               pt.size = 0.1)
 print_img(dp4,
-          title = "06-dim-ICA",
+          prefix = prefix,
+          title = "dim-ICA",
           device = device,
           width = 25)
 
@@ -83,7 +88,7 @@ print_img(dp4,
 #               split.by = "DataSet",
 #               pt.size = 0.1)
 # print_img(dp5,
-#           title = "06-dim-MDS",
+#           title = "dim-MDS",
 #           device = device)
 
 # Finding differentially expressed features (cluster biomarkers)
@@ -107,7 +112,8 @@ vln1 <- VlnPlot(seurat,
         features = markers$gene[1:2],
         split.by = "DataSet")
 print_img(vln1,
-          title = "06-violin-1",
+          prefix = prefix,
+          title = "violin-1",
           device = device,
           width = 25)
 
@@ -118,7 +124,8 @@ vln2 <- VlnPlot(seurat,
         log = TRUE,
         split.by = "DataSet")
 print_img(vln2,
-          title = "06-violin-2",
+          prefix = prefix,
+          title = "violin-2",
           device = device,
           width = 25)
 
@@ -129,7 +136,8 @@ for (i in markers$gene) {
               features = i,
               split.by = "DataSet")
   print_img(px,
-            title = paste0("06-features-plot-", i),
+            prefix = prefix,
+            title = paste0("features-plot-", i),
             device = device,
             width = 25)
 }
@@ -139,5 +147,6 @@ seurat_markers %>%
   top_n(n = 10, wt = avg_log2FC) -> top10
 hm1 <- DoHeatmap(seurat, features = top10$gene) + NoLegend()
 print_img(hm1,
-          title = "06-heatmap",
+          prefix = prefix,
+          title = "heatmap",
           device = device)
