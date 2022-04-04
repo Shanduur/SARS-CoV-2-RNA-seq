@@ -44,7 +44,8 @@ dp1 <- DimPlot(object = seurat,
               pt.size = 0.1)
 print_img(dp1,
           title = "06-dim-UMAP",
-          device = device)
+          device = device,
+          width = 25)
 
 loginfo(paste("dim plot - tsne"))
 dp2 <- DimPlot(object = seurat,
@@ -53,7 +54,8 @@ dp2 <- DimPlot(object = seurat,
               pt.size = 0.1)
 print_img(dp2,
           title = "06-dim-TSNE",
-          device = device)
+          device = device,
+          width = 25)
 
 loginfo(paste("dim plot - pca"))
 dp3 <- DimPlot(object = seurat,
@@ -62,7 +64,8 @@ dp3 <- DimPlot(object = seurat,
               pt.size = 0.1)
 print_img(dp3,
           title = "06-dim-PCA",
-          device = device)
+          device = device,
+          width = 25)
 
 loginfo(paste("dim plot - ica"))
 dp4 <- DimPlot(object = seurat,
@@ -71,7 +74,8 @@ dp4 <- DimPlot(object = seurat,
               pt.size = 0.1)
 print_img(dp4,
           title = "06-dim-ICA",
-          device = device)
+          device = device,
+          width = 25)
 
 # loginfo(paste("dim plot - mds"))
 # dp5 <- DimPlot(object = seurat,
@@ -104,7 +108,8 @@ vln1 <- VlnPlot(seurat,
         split.by = "DataSet")
 print_img(vln1,
           title = "06-violin-1",
-          device = device)
+          device = device,
+          width = 25)
 
 loginfo(paste("violin plot - 2"))
 vln2 <- VlnPlot(seurat,
@@ -114,7 +119,8 @@ vln2 <- VlnPlot(seurat,
         split.by = "DataSet")
 print_img(vln2,
           title = "06-violin-2",
-          device = device)
+          device = device,
+          width = 25)
 
 loginfo(paste("feature plots - 1"))
 for (i in markers$gene) {
@@ -123,8 +129,9 @@ for (i in markers$gene) {
               features = i,
               split.by = "DataSet")
   print_img(px,
-            title = paste0("features-plot-", i),
-            device = device)
+            title = paste0("06-features-plot-", i),
+            device = device,
+            width = 25)
 }
 
 seurat_markers %>%
