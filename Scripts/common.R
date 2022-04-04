@@ -84,7 +84,7 @@ print_img <- function(x,
                       height = 8,
                       title = NULL,
                       device = NULL,
-                      prefix = prefix,
+                      prefix = "00",
                       output_folder = "./Data/Output/") {
   env_rmote <- FALSE
   if ("rmote" %in% .packages(all.available = TRUE)) {
@@ -101,7 +101,6 @@ print_img <- function(x,
   }
   title <- basename(title)
   title <- gsub(" ", "_", title)
-  title <- paste(prefix, title, sep = "-")
 
   graphics.off()
 
@@ -114,7 +113,7 @@ print_img <- function(x,
       graphics_device <- png
     }
 
-    graphics_device(file = file.path(output_folder, paste0(title, ".", device)),
+    graphics_device(file = file.path(output_folder, paste0(prefix, "-", title, ".", device)),
           width = width,
           height = height)
   }
