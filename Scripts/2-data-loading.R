@@ -1,7 +1,7 @@
 source("./Scripts/common.R")
 
-# device <- "pdf"
-device <- NULL
+device <- "pdf"
+# device <- NULL
 
 if (!require("Seurat")) {
   install.packages("Seurat")
@@ -41,8 +41,8 @@ for (i in 1:length(files)) {
 }
 
 meta <- c(
-  NULL,
-  NULL,
+  "",
+  "",
   "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.meta.csv",
   "./Data/SARS-COV-2/Smokers/internal_smokerslung.meta.csv",
   "./Data/Pneumonia/GSE164948_cap_control_count_metadata.csv",

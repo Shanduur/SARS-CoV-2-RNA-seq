@@ -147,7 +147,7 @@ load_counts <- function(filename,
   time_end <- Sys.time()
   loginfo(paste("loading expression matrix took", as_hms(time_end - time_start)))
 
-  if (!is.null(meta)) {
+  if (!is.null(meta) || meta == "") {
     loginfo("loading raw metadata")
     raw_meta <- read.table(meta, header = TRUE, sep = meta_separator, quote = quote)
   } else {
@@ -156,7 +156,7 @@ load_counts <- function(filename,
 
   loginfo("printing histogram")
   print_img(raw_data, fun = col_sum_hist, device = device, title = paste0("histogram", filename))
-  
+
   loginfo("creating seurat object")
   seurat_object <- CreateSeuratObject(counts = raw_data,
                                       min.cells = min_cells,
