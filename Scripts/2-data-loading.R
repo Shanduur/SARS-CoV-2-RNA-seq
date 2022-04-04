@@ -14,23 +14,23 @@ if (!require("ggplot2")) {
 }
 
 samples <- c(
-  "fibrosis-01",
-  "fibrosis-02",
-  "non-smokers",
-  "smokers",
+  # "fibrosis-01",
+  # "fibrosis-02",
   "cap-ctrl",
   "covid-ctrl",
-  "covid-cap"
+  "covid-cap",
+  "smokers",
+  "non-smokers"
   )
 
 files <- c(
-  "./Data/Fibrosis/Filtred/GSM3489183_IPF_01_filtered_gene_bc_matrices_h5.h5",
-  "./Data/Fibrosis/Filtred/GSM3489184_IPF_02_filtered_gene_bc_matrices_h5.h5",
-  "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.expression.csv",
-  "./Data/SARS-COV-2/Smokers/internal_smokerslung.expression.csv",
+  # "./Data/Fibrosis/Filtred/GSM3489183_IPF_01_filtered_gene_bc_matrices_h5.h5",
+  # "./Data/Fibrosis/Filtred/GSM3489184_IPF_02_filtered_gene_bc_matrices_h5.h5",
   "./Data/Pneumonia/GSE164948_cap_control_RNA_counts.csv",
   "./Data/Pneumonia/GSE164948_covid_control_RNA_counts.csv",
-  "./Data/Pneumonia/GSE164948_covid_cap_RNA_counts.csv"
+  "./Data/Pneumonia/GSE164948_covid_cap_RNA_counts.csv",
+  "./Data/SARS-COV-2/Smokers/internal_smokerslung.expression.csv",
+  "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.expression.csv"
 )
 
 for (i in 1:length(files)) {
@@ -42,13 +42,13 @@ for (i in 1:length(files)) {
 }
 
 meta <- c(
-  "",
-  "",
-  "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.meta.csv",
-  "./Data/SARS-COV-2/Smokers/internal_smokerslung.meta.csv",
+  # "",
+  # "",
   "./Data/Pneumonia/GSE164948_cap_control_count_metadata.csv",
   "./Data/Pneumonia/GSE164948_covid_control_count_metadata.csv",
-  "./Data/Pneumonia/GSE164948_covid_cap_count_metadata.csv"
+  "./Data/Pneumonia/GSE164948_covid_cap_count_metadata.csv",
+  "./Data/SARS-COV-2/Smokers/internal_smokerslung.meta.csv",
+  "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.meta.csv"
 )
 
 for (i in 1:length(meta)) {
