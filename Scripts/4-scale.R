@@ -1,5 +1,6 @@
 source("./Scripts/common.R")
 
+prefix <- "04"
 device <- "pdf"
 # device <- NULL
 
@@ -52,12 +53,14 @@ plot2 <- LabelPoints(plot = plot1, points = top10, repel = TRUE)
 
 loginfo(paste("plot1+plot2 - VariableFeaturePlot"))
 print_img(plot1 + plot2,
-          title = "04-VariableFeatures",
+          prefix = prefix,
+          title = "VariableFeatures",
           device = device)
 
 loginfo(paste("plot2 - VariableFeaturePlot labeled"))
 print_img(plot2,
-          title = "04-VariableFeatures-labeled",
+          prefix = prefix,
+          title = "VariableFeatures-labeled",
           device = device)
 
 saveRDS(seurat, file = paste0(checkpoint_folder, "4-scaled.rds"))

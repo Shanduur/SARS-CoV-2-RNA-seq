@@ -1,5 +1,6 @@
 source("./Scripts/common.R")
 
+prefix <- "05"
 device <- "pdf"
 # device <- NULL
 
@@ -45,49 +46,55 @@ print(seurat[["ica"]], dims = 1:5, nfeatures = 5)
 loginfo(paste("visialize Dim reduction - pca"))
 vdl1 <- VizDimLoadings(seurat, dims = 1:2, reduction = "pca")
 print_img(vdl1,
-          title = "05-VizDim-PCA",
+          prefix = prefix,
+          title = "VizDim-PCA",
           device = device)
 
 loginfo(paste("visialize Dim reduction - ica"))
 vdl2 <- VizDimLoadings(seurat, dims = 1:2, reduction = "ica")
 print_img(vdl2,
-          title = "05-VizDim-ICA",
+          prefix = prefix,
+          title = "VizDim-ICA",
           device = device)
 
 # loginfo(paste("visialize Dim reduction - mds"))
 # vdl3 <- VizDimLoadings(seurat, dims = 1:2, reduction = "mds")
 # print_img(vdl3,
-#           title = "05-VizDim-MDS",
+#           title = "VizDim-MDS",
 #           device = device)
 
 loginfo(paste("dim plot - pca"))
 dm1 <- DimPlot(seurat, reduction = "pca")
 print_img(dm1,
-          title = "05-DimPlot-PCA",
+          prefix = prefix,
+          title = "DimPlot-PCA",
           device = device)
 
 loginfo(paste("dim plot - ica"))
 dm2 <- DimPlot(seurat, reduction = "ica")
 print_img(dm2,
-          title = "05-DimPlot-ICA",
+          prefix = prefix,
+          title = "DimPlot-ICA",
           device = device)
 
 # loginfo(paste("dim plot - mds"))
 # dm3 <- DimPlot(seurat, reduction = "mds")
 # print_img(dm3,
-#           title = "05-DimPlot-MDS",
+#           title = "DimPlot-MDS",
 #           device = device)
 
 loginfo(paste("dim heatmap 1"))
 hm1 <- DimHeatmap(seurat, dims = 1, cells = 500, balanced = TRUE)
 print_img(hm1,
-          title = "05-DimHeatmap-1",
+          prefix = prefix,
+          title = "DimHeatmap-1",
           device = device)
 
 loginfo(paste("dim heatmap 2"))
 hm2 <- DimHeatmap(seurat, dims = 1:15, cells = 500, balanced = TRUE)
 print_img(hm2,
-          title = "05-DimHeatmap-1-15",
+          prefix = prefix,
+          title = "DimHeatmap-1-15",
           device = device)
 
 # Determine the ‘dimensionality’ of the dataset
@@ -106,7 +113,8 @@ write.table(x = pc_pval,
 loginfo(paste("jackstraw plot"))
 jsp1 <- JackStrawPlot(seurat, dims = 1:15)
 print_img(jsp1,
-          title = "05-JackStrawPlot",
+          prefix = prefix,
+          title = "JackStrawPlot",
           device = device)
 
 saveRDS(seurat, file = paste0(checkpoint_folder, "5-pca-jackstraw.rds"))
