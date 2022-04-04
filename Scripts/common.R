@@ -68,8 +68,7 @@ if (!require("BiocManager")) {
   BiocManager::install()
 }
 
-install.packages("BiocManager")
-BiocManager::install("limma")
+BiocManager::install("limma", ask = FALSE, update = FALSE)
 
 col_sum_hist <- function(x) {
   hist(colSums(x),
@@ -155,7 +154,7 @@ load_counts <- function(filename,
   }
 
   loginfo("printing histogram")
-  print_img(raw_data, fun = col_sum_hist, device = device, title = paste0("histogram", filename))
+  print_img(raw_data, fun = col_sum_hist, device = device, title = paste0("00-histogram", filename))
 
   loginfo("creating seurat object")
   seurat_object <- CreateSeuratObject(counts = raw_data,
@@ -175,7 +174,7 @@ load_hdf5 <- function(filename,
   raw_data <- Read10X_h5(filename = filename)
 
   loginfo("printing histogram (h5)")
-  print_img(raw_data, fun = col_sum_hist, device = device, title = paste0("histogram", filename))
+  print_img(raw_data, fun = col_sum_hist, device = device, title = paste0("00-histogram", filename))
 
   loginfo("creating seurat object (h5)")
   seurat_object <- CreateSeuratObject(counts = raw_data,

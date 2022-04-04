@@ -15,8 +15,8 @@ if (!require("ggplot2")) {
 samples <- c(
   "fibrosis-01",
   "fibrosis-02",
-  "non-smokers",
-  "smokers",
+  # "non-smokers",
+  # "smokers",
   "cap-ctrl",
   "covid-ctrl",
   "covid-cap"
@@ -25,8 +25,8 @@ samples <- c(
 files <- c(
   "./Data/Fibrosis/Filtred/GSM3489183_IPF_01_filtered_gene_bc_matrices_h5.h5",
   "./Data/Fibrosis/Filtred/GSM3489184_IPF_02_filtered_gene_bc_matrices_h5.h5",
-  "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.expression.csv",
-  "./Data/SARS-COV-2/Smokers/internal_smokerslung.expression.csv",
+  # "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.expression.csv",
+  # "./Data/SARS-COV-2/Smokers/internal_smokerslung.expression.csv",
   "./Data/Pneumonia/GSE164948_cap_control_RNA_counts.csv",
   "./Data/Pneumonia/GSE164948_covid_control_RNA_counts.csv",
   "./Data/Pneumonia/GSE164948_covid_cap_RNA_counts.csv"
@@ -43,8 +43,8 @@ for (i in 1:length(files)) {
 meta <- c(
   "",
   "",
-  "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.meta.csv",
-  "./Data/SARS-COV-2/Smokers/internal_smokerslung.meta.csv",
+  # "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.meta.csv",
+  # "./Data/SARS-COV-2/Smokers/internal_smokerslung.meta.csv",
   "./Data/Pneumonia/GSE164948_cap_control_count_metadata.csv",
   "./Data/Pneumonia/GSE164948_covid_control_count_metadata.csv",
   "./Data/Pneumonia/GSE164948_covid_cap_count_metadata.csv"
@@ -88,25 +88,25 @@ head(seurat[["percent.mt"]], n = 20)
 loginfo(paste("histogram 1: nFeature_RNA"))
 print_img(table(seurat[["nFeature_RNA"]]),
           fun = hist,
-          title = "nFeature_RNA",
+          title = "01-nFeature_RNA",
           device = device)
 
 loginfo(paste("histogram 2: percent.mt"))
 print_img(table(seurat[["percent.mt"]]),
           fun = hist,
-          title = "percent-mt",
+          title = "01-percent-mt",
           device = device)
 
 loginfo(paste("histogram 3: percent.rb"))
 print_img(table(seurat[["percent.rb"]]),
           fun = hist,
-          title = "percent-rb",
+          title = "01-percent-rb",
           device = device)
 
 loginfo(paste("histogram 4: nCount_RNA"))
 print_img(table(seurat[["nCount_RNA"]]),
           fun = hist,
-          title = "nCount_RNA",
+          title = "01-nCount_RNA",
           device = device)
 
 # Visualize QC metrics as a violin plot
@@ -117,7 +117,7 @@ vln1 <- VlnPlot(seurat,
   pt.size = 0.001
 )
 print_img(vln1,
-          title = "violin-qc-metrics-1",
+          title = "01-violin-qc-metrics-1",
           device = device)
 
 loginfo(paste("violin plot 2"))
@@ -127,7 +127,7 @@ vln2 <- VlnPlot(seurat,
   pt.size = 0
 )
 print_img(vln2,
-          title = "violin-qc-metrics-2",
+          title = "01-violin-qc-metrics-2",
           device = device)
 
 # FeatureScatter is typically used to visualize feature-feature relationships, but can be used
@@ -148,19 +148,19 @@ count_q <- quantile(seurat@meta.data$nCount_RNA, 0.95)
 
 loginfo(paste("plot1 - percent.mt"))
 print_img(plot1 + geom_hline(yintercept = 5, color = "red"),
-          title = "plot1-percent.mt",
+          title = "01-plot1-percent.mt",
           device = device)
 
 loginfo(paste("plot2 - percent.rb"))
 print_img(plot2 + geom_hline(yintercept = 5, color = "red"),
-          title = "plot2 - percent.rb",
+          title = "01-plot2-percent.rb",
           device = device)
 
 loginfo(paste("plot3 - nFeature_RNA"))
 print_img(plot3 +
             geom_hline(yintercept = 500, color = "red") +
             geom_vline(xintercept = count_q, color = "red"),
-          title = "plot3-nFeature_RNA",
+          title = "01-plot3-nFeature_RNA",
           device = device)
 
 loginfo(paste("Feature stats:", feature_min, feature_m, feature_max, feature_s))

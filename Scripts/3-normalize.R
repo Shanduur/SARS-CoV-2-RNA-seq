@@ -29,7 +29,7 @@ column_variances <- colVars(as.matrix(GetAssayData(object = seurat, slot = "data
 loginfo("printing histogram of variances")
 print_img(column_variances,
           fun = hist,
-          title = "column-variances",
+          title = "02-column-variances",
           device = device)
 
 # wektor wariancji eksportujemy (wyliczony ze znormalizowanych danych)

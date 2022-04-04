@@ -43,7 +43,7 @@ dp1 <- DimPlot(object = seurat,
               split.by = "DataSet",
               pt.size = 0.1)
 print_img(dp1,
-          title = "dim-UMAP",
+          title = "06-dim-UMAP",
           device = device)
 
 loginfo(paste("dim plot - tsne"))
@@ -52,7 +52,7 @@ dp2 <- DimPlot(object = seurat,
               split.by = "DataSet",
               pt.size = 0.1)
 print_img(dp2,
-          title = "dim-TSNE",
+          title = "06-dim-TSNE",
           device = device)
 
 loginfo(paste("dim plot - pca"))
@@ -61,7 +61,7 @@ dp3 <- DimPlot(object = seurat,
               split.by = "DataSet",
               pt.size = 0.1)
 print_img(dp3,
-          title = "dim-PCA",
+          title = "06-dim-PCA",
           device = device)
 
 loginfo(paste("dim plot - ica"))
@@ -70,7 +70,7 @@ dp4 <- DimPlot(object = seurat,
               split.by = "DataSet",
               pt.size = 0.1)
 print_img(dp4,
-          title = "dim-ICA",
+          title = "06-dim-ICA",
           device = device)
 
 # loginfo(paste("dim plot - mds"))
@@ -79,7 +79,7 @@ print_img(dp4,
 #               split.by = "DataSet",
 #               pt.size = 0.1)
 # print_img(dp5,
-#           title = "dim-MDS",
+#           title = "06-dim-MDS",
 #           device = device)
 
 # Finding differentially expressed features (cluster biomarkers)
@@ -103,7 +103,7 @@ vln1 <- VlnPlot(seurat,
         features = markers$gene[1:2],
         split.by = "DataSet")
 print_img(vln1,
-          title = "violin-1",
+          title = "06-violin-1",
           device = device)
 
 loginfo(paste("violin plot - 2"))
@@ -113,7 +113,7 @@ vln2 <- VlnPlot(seurat,
         log = TRUE,
         split.by = "DataSet")
 print_img(vln2,
-          title = "violin-2",
+          title = "06-violin-2",
           device = device)
 
 loginfo(paste("feature plots - 1"))
@@ -132,5 +132,5 @@ seurat_markers %>%
   top_n(n = 10, wt = avg_log2FC) -> top10
 hm1 <- DoHeatmap(seurat, features = top10$gene) + NoLegend()
 print_img(hm1,
-          title = "heatmap",
+          title = "06-heatmap",
           device = device)
