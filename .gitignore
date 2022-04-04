@@ -205,3 +205,4 @@ vignettes/*.pdf
 *.csv
 
 nohup.out
+Rplots.pdf
