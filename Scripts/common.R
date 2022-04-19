@@ -68,7 +68,7 @@ if (!require("BiocManager")) {
   BiocManager::install()
 }
 
-BiocManager::install("limma", ask = FALSE, update = FALSE)
+# BiocManager::install("limma", ask = FALSE, update = FALSE)
 
 col_sum_hist <- function(x) {
   hist(colSums(x),
@@ -163,6 +163,9 @@ load_counts <- function(filename,
                                       min.features = min_features,
                                       meta.data = raw_meta,
                                       project = project)
+
+  # seurat_object <- RenameCells(seurat_object, add.cell.id = project)
+  
   loginfo("load_counts done!")
   return(seurat_object)
 }
@@ -188,7 +191,7 @@ load_hdf5 <- function(filename,
 
 load_seurat <- function(filename,
                         meta = NULL,
-                        separator = FALSE,
+                        separator = NULL,
                         meta_separator = ",",
                         project = "seurat",
                         min_cells = 100,
@@ -204,7 +207,7 @@ load_seurat <- function(filename,
   } else {
     loginfo(paste("loading regular file"))
 
-    if (!separator) {
+    if (is.null(separator)) {
       if (grepl(".txt", filename, fixed = TRUE) || grepl(".tsv", filename, fixed = TRUE)) {
         loginfo("assuming separator as = \\t")
         sep <- "\t"

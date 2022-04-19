@@ -18,9 +18,9 @@ samples <- c(
   # "fibrosis-02",
   "cap-ctrl",
   "covid-ctrl",
-  "covid-cap",
-  "smokers",
-  "non-smokers"
+  "covid-cap"
+  # "smokers",
+  # "non-smokers"
   )
 
 files <- c(
@@ -28,9 +28,9 @@ files <- c(
   # "./Data/Fibrosis/Filtred/GSM3489184_IPF_02_filtered_gene_bc_matrices_h5.h5",
   "./Data/Pneumonia/GSE164948_cap_control_RNA_counts.csv",
   "./Data/Pneumonia/GSE164948_covid_control_RNA_counts.csv",
-  "./Data/Pneumonia/GSE164948_covid_cap_RNA_counts.csv",
-  "./Data/SARS-COV-2/Smokers/internal_smokerslung.expression.csv",
-  "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.expression.csv"
+  "./Data/Pneumonia/GSE164948_covid_cap_RNA_counts.csv"
+  # "./Data/SARS-COV-2/Smokers/internal_smokerslung.expression.csv",
+  # "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.expression.csv"
 )
 
 for (i in 1:length(files)) {
@@ -46,9 +46,9 @@ meta <- c(
   # "",
   "./Data/Pneumonia/GSE164948_cap_control_count_metadata.csv",
   "./Data/Pneumonia/GSE164948_covid_control_count_metadata.csv",
-  "./Data/Pneumonia/GSE164948_covid_cap_count_metadata.csv",
-  "./Data/SARS-COV-2/Smokers/internal_smokerslung.meta.csv",
-  "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.meta.csv"
+  "./Data/Pneumonia/GSE164948_covid_cap_count_metadata.csv"
+  # "./Data/SARS-COV-2/Smokers/internal_smokerslung.meta.csv",
+  # "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.meta.csv"
 )
 
 for (i in 1:length(meta)) {
@@ -73,6 +73,11 @@ for (i in 1:length(files)) {
   seurat_list[[i]][["DataSet"]] <- samples[i]
 }
 
+if (length(files) >= 5) {
+  loginfo("saving full seurat list")
+  saveRDS(seurat_list, file = paste0(checkpoint_folder, "2-seurat-list-full.rds"))
+}
+
 loginfo(paste("building seurat object"))
 seurat <- merge(
   x = seurat_list[[1]],
@@ -81,6 +86,9 @@ seurat <- merge(
   project = "SARS-CoV-2-RNA-seq"
 )
 str(seurat@meta.data)
+
+seurat@meta.data$original <- seurat@meta.data$orig.ident
+seurat@meta.data$orig.ident <- NULL
 
 seurat[["percent.mt"]] <- PercentageFeatureSet(seurat, pattern = "^MT-")
 seurat[["percent.rb"]] <- PercentageFeatureSet(seurat, pattern = "^RB-")
@@ -139,9 +147,9 @@ print_img(vln2,
 
 # FeatureScatter is typically used to visualize feature-feature relationships, but can be used
 # for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
-plot1 <- FeatureScatter(seurat, feature1 = "nCount_RNA", feature2 = "percent.mt")
-plot2 <- FeatureScatter(seurat, feature1 = "nCount_RNA", feature2 = "percent.rb")
-plot3 <- FeatureScatter(seurat, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot1 <- FeatureScatter(seurat, feature1 = "nCount_RNA", feature2 = "percent.mt") # , group.by = "DataSet")
+plot2 <- FeatureScatter(seurat, feature1 = "nCount_RNA", feature2 = "percent.rb") # , group.by = "DataSet")
+plot3 <- FeatureScatter(seurat, feature1 = "nCount_RNA", feature2 = "nFeature_RNA") # , group.by = "DataSet")
 
 feature_min <- min(seurat@meta.data$nFeature_RNA)
 feature_m <- median(seurat@meta.data$nFeature_RNA)
@@ -165,7 +173,7 @@ print_img(plot2 + geom_hline(yintercept = 5, color = "red"),
           title = "plot2-percent.rb",
           device = device)
 
-loginfo(paste("plot3 - nFeature_RNA"))
+loginfo(paste("plot3 - nFeature_RNA is the number of genes detected in each cell, nCount_RNA is the total number of molecules detected within a cell"))
 print_img(plot3 +
             geom_hline(yintercept = 500, color = "red") +
             geom_vline(xintercept = count_q, color = "red"),
@@ -178,4 +186,4 @@ loginfo(paste("UMI stats:", count_min, count_m, count_max, count_s, count_q))
 seurat <- subset(seurat, subset = nFeature_RNA > 500 & nCount_RNA < count_q & percent.mt < 5)
 
 saveRDS(seurat, file = paste0(checkpoint_folder, "2-loaded.rds"))
-rm(seurat_list)
+# rm(seurat_list)

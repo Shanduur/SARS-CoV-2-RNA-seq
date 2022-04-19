@@ -12,6 +12,11 @@ if (!require("resample")) {
   install.packages("resample")
   library(resample)
 }
+if (!require("matrixStats")) {
+  install.packages("matrixStats")
+  library(matrixStats)
+}
+
 seurat <- readRDS(file = paste0(checkpoint_folder, "2-loaded.rds"))
 
 seurat <- NormalizeData(seurat, normalization.method = "LogNormalize", scale.factor = 1e4)
@@ -25,18 +30,19 @@ seurat <- NormalizeData(seurat, normalization.method = "LogNormalize", scale.fac
 #             quote = FALSE)
 
 loginfo("calculating variances")
-column_variances <- colVars(as.matrix(GetAssayData(object = seurat, slot = "data")))
+variances <- rowVars(as.matrix(GetAssayData(object = seurat, slot = "data")),
+                         useNames = "TRUE")
 
 loginfo("printing histogram of variances")
-print_img(column_variances,
+print_img(variances,
           fun = hist,
           prefix = prefix,
-          title = "column-variances",
+          title = "variances",
           device = device)
 
 # wektor wariancji eksportujemy (wyliczony ze znormalizowanych danych)
-loginfo("exporting table of column variances to file")
-write.table(column_variances,
+loginfo("exporting table of row variances to file")
+write.table(variances,
             paste0(export_folder, "variances.data.txt"),
             sep = "\t",
             row.names = TRUE,
