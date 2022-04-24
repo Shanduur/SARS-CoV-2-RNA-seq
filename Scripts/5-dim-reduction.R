@@ -84,14 +84,14 @@ print_img(dm2,
 #           device = device)
 
 loginfo(paste("dim heatmap 1"))
-hm1 <- DimHeatmap(seurat, dims = 1, cells = 500, balanced = TRUE)
+hm1 <- DimHeatmap(seurat, dims = 1, cells = 500, balanced = TRUE, fast = FALSE)
 print_img(hm1,
           prefix = prefix,
           title = "DimHeatmap-1",
           device = device)
 
 loginfo(paste("dim heatmap 2"))
-hm2 <- DimHeatmap(seurat, dims = 1:15, cells = 500, balanced = TRUE)
+hm2 <- DimHeatmap(seurat, dims = 1:15, cells = 500, balanced = TRUE, fast = FALSE)
 print_img(hm2,
           prefix = prefix,
           title = "DimHeatmap-1-15",

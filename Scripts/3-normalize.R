@@ -21,14 +21,6 @@ seurat <- readRDS(file = paste0(checkpoint_folder, "2-loaded.rds"))
 
 seurat <- NormalizeData(seurat, normalization.method = "LogNormalize", scale.factor = 1e4)
 
-# loginfo("exporting pre-normalization data to file")
-# write.table(as.matrix(GetAssayData(object = seurat, slot = "data")),
-#             paste0(export_folder, "pre-normalization.data.txt"),
-#             sep = '\t',
-#             row.names = TRUE,
-#             col.names = TRUE,
-#             quote = FALSE)
-
 loginfo("calculating variances")
 variances <- rowVars(as.matrix(GetAssayData(object = seurat, slot = "data")),
                          useNames = "TRUE")

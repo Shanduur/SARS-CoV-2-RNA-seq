@@ -143,3 +143,5 @@ print_img(hm1,
           prefix = prefix,
           title = "heatmap",
           device = device)
+
+saveRDS(seurat, file = paste0(checkpoint_folder, "6-biomarkers.rds"))

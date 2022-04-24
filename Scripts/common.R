@@ -165,7 +165,7 @@ load_counts <- function(filename,
                                       project = project)
 
   # seurat_object <- RenameCells(seurat_object, add.cell.id = project)
-  
+
   loginfo("load_counts done!")
   return(seurat_object)
 }
