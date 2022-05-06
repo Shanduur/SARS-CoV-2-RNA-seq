@@ -1,5 +1,9 @@
 # rm(list = ls())
 
+if (!require("munsell")) {
+  install.packages("munsell")
+}
+
 if (!require("logging")) {
   install.packages("logging")
   library(logging)
@@ -69,6 +73,11 @@ if (!require("BiocManager")) {
 }
 
 # BiocManager::install("limma", ask = FALSE, update = FALSE)
+
+outersect <- function(x, y) {
+  sort(c(setdiff(x, y),
+         setdiff(y, x)))
+}
 
 col_sum_hist <- function(x) {
   hist(colSums(x),

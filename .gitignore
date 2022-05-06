@@ -200,9 +200,14 @@ vignettes/*.pdf
 .DS_Store
 
 **/Exported/
+**/Checkpoints/
+**/Output/
 
 *.h5
 *.csv
+*.annoy
 
 nohup.out
 Rplots.pdf
+
+!Data/Azimuth/*.csv
