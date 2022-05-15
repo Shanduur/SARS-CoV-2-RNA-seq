@@ -159,6 +159,9 @@ load_counts <- function(filename,
   if (!is.null(meta) || meta == "") {
     loginfo("loading raw metadata")
     raw_meta <- read.table(meta, header = TRUE, sep = meta_separator, quote = quote)
+    raw_meta <- as.data.frame(raw_meta)
+    rownames(raw_meta) <- sub("-", ".", raw_meta$X) 
+    raw_meta <- subset(raw_meta, select=-c(X))
   } else {
     raw_meta <- NULL
   }
@@ -201,7 +204,7 @@ load_hdf5 <- function(filename,
 load_seurat <- function(filename,
                         meta = NULL,
                         separator = NULL,
-                        meta_separator = ",",
+                        meta_separator = ";",
                         project = "seurat",
                         min_cells = 100,
                         min_features = 10,

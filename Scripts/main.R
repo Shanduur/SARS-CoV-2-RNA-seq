@@ -47,13 +47,7 @@ samples <- c(
   )
 
 files <- c(
-  # "./Data/Fibrosis/Filtred/GSM3489183_IPF_01_filtered_gene_bc_matrices_h5.h5",
-  # "./Data/Fibrosis/Filtred/GSM3489184_IPF_02_filtered_gene_bc_matrices_h5.h5",
-  "./Data/Pneumonia/GSE164948_cap_control_RNA_counts.csv",
-  "./Data/Pneumonia/GSE164948_covid_control_RNA_counts.csv",
-  "./Data/Pneumonia/GSE164948_covid_cap_RNA_counts.csv"
-  # "./Data/SARS-COV-2/Smokers/internal_smokerslung.expression.csv",
-  # "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.expression.csv"
+  "./Data/Pneumonia/GSE164948_covid_control_RNA_counts.csv"
 )
 
 for (i in 1:length(files)) {
@@ -65,13 +59,7 @@ for (i in 1:length(files)) {
 }
 
 meta <- c(
-  # "",
-  # "",
-  "./Data/Pneumonia/GSE164948_cap_control_count_metadata.csv",
-  "./Data/Pneumonia/GSE164948_covid_control_count_metadata.csv",
-  "./Data/Pneumonia/GSE164948_covid_cap_count_metadata.csv"
-  # "./Data/SARS-COV-2/Smokers/internal_smokerslung.meta.csv",
-  # "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.meta.csv"
+  "./Data/Pneumonia/GSE164948_covid_control_count_metadata_added.csv"
 )
 
 for (i in 1:length(meta)) {
@@ -206,7 +194,7 @@ print_img(plot3 +
 
 loginfo(paste("Feature stats:", feature_min, feature_m, feature_max, feature_s))
 loginfo(paste("UMI stats:", count_min, count_m, count_max, count_s, count_q))
-seurat <- subset(seurat, subset = nFeature_RNA > 500 & nCount_RNA < count_q & percent.mt < 5)
+seurat <- subset(seurat, subset = nFeature_RNA > 500 & nCount_RNA < count_q & percent.mt < 5 & smoking != -1)
 
 saveRDS(seurat, file = paste0(checkpoint_folder, "2-loaded.rds"))
 # rm(seurat_list)

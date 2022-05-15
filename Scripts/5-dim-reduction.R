@@ -25,9 +25,9 @@ loginfo(paste("run PCA and ProjectDim"))
 seurat <- RunPCA(seurat, npcs = 40)
 seurat <- ProjectDim(object = seurat)
 
-loginfo(paste("run ICA and ProjectDim"))
-seurat <- RunICA(seurat, nics = 40)
-seurat <- ProjectDim(object = seurat)
+# loginfo(paste("run ICA and ProjectDim"))
+# seurat <- RunICA(seurat, nics = 40)
+# seurat <- ProjectDim(object = seurat)
 
 # loginfo(paste("calculate distances between data"))
 # d <- parDist(t(GetAssayData(seurat, slot = "scale.data")))
@@ -41,7 +41,7 @@ seurat <- ProjectDim(object = seurat)
 
 # Examine and visualize PCA results a few different ways
 print(seurat[["pca"]], dims = 1:5, nfeatures = 5)
-print(seurat[["ica"]], dims = 1:5, nfeatures = 5)
+# print(seurat[["ica"]], dims = 1:5, nfeatures = 5)
 
 loginfo(paste("visialize Dim reduction - pca"))
 vdl1 <- VizDimLoadings(seurat, dims = 1:2, reduction = "pca")
@@ -50,12 +50,12 @@ print_img(vdl1,
           title = "VizDim-PCA",
           device = device)
 
-loginfo(paste("visialize Dim reduction - ica"))
-vdl2 <- VizDimLoadings(seurat, dims = 1:2, reduction = "ica")
-print_img(vdl2,
-          prefix = prefix,
-          title = "VizDim-ICA",
-          device = device)
+# loginfo(paste("visialize Dim reduction - ica"))
+# vdl2 <- VizDimLoadings(seurat, dims = 1:2, reduction = "ica")
+# print_img(vdl2,
+#           prefix = prefix,
+#           title = "VizDim-ICA",
+#           device = device)
 
 # loginfo(paste("visialize Dim reduction - mds"))
 # vdl3 <- VizDimLoadings(seurat, dims = 1:2, reduction = "mds")
@@ -70,12 +70,12 @@ print_img(dm1,
           title = "DimPlot-PCA",
           device = device)
 
-loginfo(paste("dim plot - ica"))
-dm2 <- DimPlot(seurat, reduction = "ica")
-print_img(dm2,
-          prefix = prefix,
-          title = "DimPlot-ICA",
-          device = device)
+# loginfo(paste("dim plot - ica"))
+# dm2 <- DimPlot(seurat, reduction = "ica")
+# print_img(dm2,
+#           prefix = prefix,
+#           title = "DimPlot-ICA",
+#           device = device)
 
 # loginfo(paste("dim plot - mds"))
 # dm3 <- DimPlot(seurat, reduction = "mds")

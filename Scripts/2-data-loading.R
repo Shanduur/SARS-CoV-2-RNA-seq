@@ -16,9 +16,9 @@ if (!require("ggplot2")) {
 samples <- c(
   # "fibrosis-01",
   # "fibrosis-02",
-  "cap-ctrl",
-  "covid-ctrl",
-  "covid-cap"
+  # "cap-ctrl",
+  "covid-ctrl"
+  # "covid-cap"
   # "smokers",
   # "non-smokers"
   )
@@ -26,9 +26,9 @@ samples <- c(
 files <- c(
   # "./Data/Fibrosis/Filtred/GSM3489183_IPF_01_filtered_gene_bc_matrices_h5.h5",
   # "./Data/Fibrosis/Filtred/GSM3489184_IPF_02_filtered_gene_bc_matrices_h5.h5",
-  "./Data/Pneumonia/GSE164948_cap_control_RNA_counts.csv",
-  "./Data/Pneumonia/GSE164948_covid_control_RNA_counts.csv",
-  "./Data/Pneumonia/GSE164948_covid_cap_RNA_counts.csv"
+  # "./Data/Pneumonia/GSE164948_cap_control_RNA_counts.csv",
+  "./Data/Pneumonia/GSE164948_covid_control_RNA_counts.csv"
+  # "./Data/Pneumonia/GSE164948_covid_cap_RNA_counts.csv"
   # "./Data/SARS-COV-2/Smokers/internal_smokerslung.expression.csv",
   # "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.expression.csv"
 )
@@ -44,9 +44,9 @@ for (i in 1:length(files)) {
 meta <- c(
   # "",
   # "",
-  "./Data/Pneumonia/GSE164948_cap_control_count_metadata.csv",
-  "./Data/Pneumonia/GSE164948_covid_control_count_metadata.csv",
-  "./Data/Pneumonia/GSE164948_covid_cap_count_metadata.csv"
+  # "./Data/Pneumonia/GSE164948_cap_control_count_metadata.csv",
+  "./Data/Pneumonia/GSE164948_covid_control_count_metadata_added.csv"
+  # "./Data/Pneumonia/GSE164948_covid_cap_count_metadata.csv"
   # "./Data/SARS-COV-2/Smokers/internal_smokerslung.meta.csv",
   # "./Data/SARS-COV-2/NonSmokers/internal_nonsmokerslung.meta.csv"
 )
@@ -68,7 +68,7 @@ for (i in 1:length(files)) {
     filename = files[i],
     project = samples[i],
     meta = meta[i],
-    meta_separator = "\t"
+    meta_separator = ";"
   )
   seurat_list[[i]][["DataSet"]] <- samples[i]
 }
@@ -78,14 +78,19 @@ if (length(files) >= 5) {
   saveRDS(seurat_list, file = paste0(checkpoint_folder, "2-seurat-list-full.rds"))
 }
 
-loginfo(paste("building seurat object"))
-seurat <- merge(
-  x = seurat_list[[1]],
-  y = unlist(seurat_list)[2:length(seurat_list)],
-  add.cell.ids = samples,
-  project = "SARS-CoV-2-RNA-seq"
-)
-str(seurat@meta.data)
+loginfo(paste("building seurat object of length =", length(seurat_list)))
+if (length(seurat_list) > 1) {
+  seurat <- merge(
+    x = seurat_list[[1]],
+    y = unlist(seurat_list)[2:length(seurat_list)],
+    add.cell.ids = samples,
+    project = "SARS-CoV-2-RNA-seq"
+  )
+  str(seurat@meta.data)
+} else {
+  seurat <- seurat_list[[1]]
+}
+
 
 seurat@meta.data$original <- seurat@meta.data$orig.ident
 seurat@meta.data$orig.ident <- NULL
@@ -127,7 +132,8 @@ loginfo(paste("violin plot 1"))
 vln1 <- VlnPlot(seurat,
   features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb"),
   ncol = 2,
-  pt.size = 0.001
+  pt.size = 0.001,
+  group.by = "smoking"
 )
 print_img(vln1,
           prefix = prefix,
@@ -138,7 +144,8 @@ loginfo(paste("violin plot 2"))
 vln2 <- VlnPlot(seurat,
   features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb"),
   ncol = 2,
-  pt.size = 0
+  pt.size = 0,
+  group.by = "smoking"
 )
 print_img(vln2,
           prefix = prefix,
@@ -147,9 +154,9 @@ print_img(vln2,
 
 # FeatureScatter is typically used to visualize feature-feature relationships, but can be used
 # for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
-plot1 <- FeatureScatter(seurat, feature1 = "nCount_RNA", feature2 = "percent.mt") # , group.by = "DataSet")
-plot2 <- FeatureScatter(seurat, feature1 = "nCount_RNA", feature2 = "percent.rb") # , group.by = "DataSet")
-plot3 <- FeatureScatter(seurat, feature1 = "nCount_RNA", feature2 = "nFeature_RNA") # , group.by = "DataSet")
+plot1 <- FeatureScatter(seurat, feature1 = "nCount_RNA", feature2 = "percent.mt", group.by = "smoking")
+plot2 <- FeatureScatter(seurat, feature1 = "nCount_RNA", feature2 = "percent.rb", group.by = "smoking")
+plot3 <- FeatureScatter(seurat, feature1 = "nCount_RNA", feature2 = "nFeature_RNA", group.by = "smoking")
 
 feature_min <- min(seurat@meta.data$nFeature_RNA)
 feature_m <- median(seurat@meta.data$nFeature_RNA)
@@ -183,7 +190,7 @@ print_img(plot3 +
 
 loginfo(paste("Feature stats:", feature_min, feature_m, feature_max, feature_s))
 loginfo(paste("UMI stats:", count_min, count_m, count_max, count_s, count_q))
-seurat <- subset(seurat, subset = nFeature_RNA > 500 & nCount_RNA < count_q & percent.mt < 5)
+seurat <- subset(seurat, subset = nFeature_RNA > 500 & nCount_RNA < count_q & percent.mt < 5 & smoking != -1)
 
 saveRDS(seurat, file = paste0(checkpoint_folder, "2-loaded.rds"))
 # rm(seurat_list)

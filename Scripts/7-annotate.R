@@ -37,8 +37,8 @@ annotationLevels <- c(
 )
 
 for (level in annotationLevels) {
-  loginfo(paste("predicted Azimuth annotations on dim plot for [", paste(intersection, collapse = ', '), "]"))
-  dpann <- DimPlot(seurat, group.by = level, label = TRUE, label.size = 3) + NoLegend()
+  loginfo(paste("predicted Azimuth annotations on dim plot for [", paste(intersection, collapse = ", "), "]"))
+  dpann <- DimPlot(seurat, group.by = level, label = TRUE, label.size = 3, split.by = "smoking") + NoLegend()
   print_img(dpann,
             prefix = prefix,
             title = paste0("dim_plot", level, sep = "-"),
@@ -51,8 +51,8 @@ for (level in annotationLevels) {
   annotationFile <- paste0("./Data/Azimuth/Azimuth_Lung_Annotations_-_Level_", level ,".csv")
   
   loginfo(paste("loading data from file:", annotationFile))
-  annos <- read.table(file = annotationFile, sep = ',', header = TRUE)
-  annos$Markers <- strsplit(annos$Markers, split = ',')
+  annos <- read.table(file = annotationFile, sep = ",", header = TRUE)
+  annos$Markers <- strsplit(annos$Markers, split = ",")
 
   i <- 0
   for (id in annos$Label) {
@@ -63,14 +63,14 @@ for (level in annotationLevels) {
     dir.create(paste(output_folder, level, id, sep = "/"), recursive = TRUE)
     
     if (length(intersection) > 0) {
-      loginfo(paste("Violin plot for [", paste(intersection, collapse = ', '), "]"))
+      loginfo(paste("Violin plot for [", paste(intersection, collapse = ", "), "]"))
       vpl <- VlnPlot(seurat, features = intersection, log = TRUE, pt.size = 0)
       print_img(vpl,
                 prefix = paste(level, id, prefix, sep = "/"),
                 title = paste0("violin_plot", level, id, i, sep = "-"),
                 device = device)
       
-      loginfo(paste("Feature plot for [", paste(intersection, collapse = ', '), "]"))
+      loginfo(paste("Feature plot for [", paste(intersection, collapse = ", "), "]"))
       fpl <- FeaturePlot(seurat, features = intersection)
       print_img(fpl,
                 prefix = paste(level, id, prefix, sep = "/"),

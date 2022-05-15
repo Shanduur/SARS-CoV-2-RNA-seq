@@ -24,7 +24,7 @@ seurat <- readRDS(file = paste0(checkpoint_folder, "5-dim-reduction.rds"))
 loginfo(paste("dim plot - umap"))
 dp1 <- DimPlot(object = seurat,
               reduction = "umap",
-              # split.by = "DataSet",
+              split.by = "smoking",
               pt.size = 0.1)
 print_img(dp1,
           prefix = prefix,
@@ -36,7 +36,7 @@ print_img(dp1,
 loginfo(paste("dim plot - tsne"))
 dp2 <- DimPlot(object = seurat,
               reduction = "tsne",
-              # split.by = "DataSet",
+              split.by = "smoking",
               pt.size = 0.1)
 print_img(dp2,
           prefix = prefix,
@@ -48,7 +48,7 @@ print_img(dp2,
 loginfo(paste("dim plot - pca"))
 dp3 <- DimPlot(object = seurat,
               reduction = "pca",
-              # split.by = "DataSet",
+              split.by = "smoking",
               pt.size = 0.1)
 print_img(dp3,
           prefix = prefix,
@@ -57,17 +57,17 @@ print_img(dp3,
           # width = 25
           )
 
-loginfo(paste("dim plot - ica"))
-dp4 <- DimPlot(object = seurat,
-              reduction = "ica",
-              # split.by = "DataSet",
-              pt.size = 0.1)
-print_img(dp4,
-          prefix = prefix,
-          title = "dim-ICA",
-          device = device,
-          # width = 25
-          )
+# loginfo(paste("dim plot - ica"))
+# dp4 <- DimPlot(object = seurat,
+#               reduction = "ica",
+#               split.by = "smoking",
+#               pt.size = 0.1)
+# print_img(dp4,
+#           prefix = prefix,
+#           title = "dim-ICA",
+#           device = device,
+#           # width = 25
+#           )
 
 # loginfo(paste("dim plot - mds"))
 # dp5 <- DimPlot(object = seurat,
@@ -97,7 +97,7 @@ print(seurat[["pca"]], dims = 1:5, nfeatures = 5)
 loginfo(paste("violin plot - 1"))
 vln1 <- VlnPlot(seurat,
         features = markers$gene[1:2],
-        # split.by = "DataSet"
+        split.by = "smoking"
         )
 print_img(vln1,
           prefix = prefix,
@@ -111,7 +111,7 @@ vln2 <- VlnPlot(seurat,
         features = markers$gene[1:2],
         slot = "counts",
         log = TRUE,
-        # split.by = "DataSet"
+        split.by = "smoking"
         )
 print_img(vln2,
           prefix = prefix,
@@ -125,7 +125,7 @@ for (i in markers$gene) {
   print(i)
   px <- FeaturePlot(seurat,
               features = i,
-              # split.by = "DataSet"
+              split.by = "smoking"
               )
   print_img(px,
             prefix = prefix,
