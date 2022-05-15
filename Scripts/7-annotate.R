@@ -43,6 +43,12 @@ for (level in annotationLevels) {
             prefix = prefix,
             title = paste0("dim_plot", level, sep = "-"),
             device = device)
+
+  vlnScore <- VlnPlot(bm, features = paste0(level, ".score")) + NoLegend()
+  print_img(dpann,
+            prefix = prefix,
+            title = paste0("vln_plt_score", level, sep = "-"),
+            device = device)
 }
 
 annotationLevels <- c("1", "2", "3", "4", "5", "Finest")
