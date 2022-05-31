@@ -12,6 +12,10 @@ if (!require("ggplot2")) {
   install.packages("ggplot2")
   library(ggplot2)
 }
+if (!require("plyr")) {
+  install.packages("plyr")
+  library(plyr)
+}
 
 samples <- c(
   # "fibrosis-01",
@@ -94,6 +98,8 @@ if (length(seurat_list) > 1) {
 
 seurat@meta.data$original <- seurat@meta.data$orig.ident
 seurat@meta.data$orig.ident <- NULL
+seurat@meta.data$smoking <- mapvalues(seurat@meta.data$smoking, c(-1, 0, 1), c("unknown", "non-smokers", "smokers"))
+Idents(seurat) <- seurat@meta.data$smoking
 
 seurat[["percent.mt"]] <- PercentageFeatureSet(seurat, pattern = "^MT-")
 seurat[["percent.rb"]] <- PercentageFeatureSet(seurat, pattern = "^RB-")
@@ -190,7 +196,7 @@ print_img(plot3 +
 
 loginfo(paste("Feature stats:", feature_min, feature_m, feature_max, feature_s))
 loginfo(paste("UMI stats:", count_min, count_m, count_max, count_s, count_q))
-seurat <- subset(seurat, subset = nFeature_RNA > 500 & nCount_RNA < count_q & percent.mt < 5 & smoking != -1)
+seurat <- subset(seurat, subset = nFeature_RNA > 500 & nCount_RNA < count_q & percent.mt < 5 & smoking != "unknown")
 
 saveRDS(seurat, file = paste0(checkpoint_folder, "2-loaded.rds"))
 # rm(seurat_list)

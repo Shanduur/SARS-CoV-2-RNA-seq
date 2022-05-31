@@ -26,12 +26,32 @@ seurat <- readRDS(file = paste0(checkpoint_folder, "3-normalized.rds"))
 # summary(fit)
 
 variances <- read.table(paste0(export_folder, "variances.data.txt"), header = TRUE)
-threshold <- 0.181
-selected <- variances > threshold
+threshold_log <- 0.181
+selected <- variances$variances > threshold_log
 loginfo(paste("number of selected features:", sum(selected)))
-# seurat <- subset(x=seurat, features=rownames(selected)[selected])
-VariableFeatures(seurat) <- rownames(selected)[selected]
+VariableFeatures(seurat) <- rownames(seurat)[selected]
+seurat <- subset(x=seurat, features=rownames(seurat)[selected])
 
+varbarlines <- function(data) {
+  data_sorted <- variances[order(variances$variances),]
+  x = barplot(data_sorted$variances, col = "grey")
+  lines(x = x, y = rep(threshold_log, length(x)), col = "red", lty = 1)
+  lines(x = x, y = rep(mean(data$variances), length(x)), col = "green", lty = 1)
+  lines(x = x, y = rep(median(data$variances), length(x)), col = "blue", lty = 1)
+  legend(1, 5,
+         legend = c(sprintf("mean = %.3f", mean(data$variances)),
+                    sprintf("median = %.3f", median(data$variances)), 
+                    sprintf("threshold = %.3f", threshold_log)),
+         col = c("green", "blue", "red"),
+         lty = rep(1, 3))
+}
+
+print_img(variances,
+          fun = varbarlines,
+          prefix = prefix,
+          title = "variances-selected",
+          device = device)
+ 
 # selekcja cech ze względu na wariancje
 # model składowych gausowskich
 # pierwszy komponent

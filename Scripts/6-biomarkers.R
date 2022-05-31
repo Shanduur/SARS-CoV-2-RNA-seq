@@ -96,7 +96,7 @@ print(seurat[["pca"]], dims = 1:5, nfeatures = 5)
 
 loginfo(paste("violin plot - 1"))
 vln1 <- VlnPlot(seurat,
-        features = markers$gene[1:2],
+        features = unique(markers$gene),
         split.by = "smoking"
         )
 print_img(vln1,
@@ -108,7 +108,7 @@ print_img(vln1,
 
 loginfo(paste("violin plot - 2"))
 vln2 <- VlnPlot(seurat,
-        features = markers$gene[1:2],
+        features = unique(markers$gene),
         slot = "counts",
         log = TRUE,
         split.by = "smoking"
@@ -117,7 +117,8 @@ print_img(vln2,
           prefix = prefix,
           title = "violin-2",
           device = device,
-          # width = 25
+          width = 25,
+          height = 18
           )
 
 loginfo(paste("feature plots - 1"))
@@ -138,10 +139,18 @@ for (i in markers$gene) {
 seurat_markers %>%
   group_by(cluster) %>%
   top_n(n = 10, wt = avg_log2FC) -> top10
-hm1 <- DoHeatmap(seurat, features = top10$gene) + NoLegend()
+hm1 <- DoHeatmap(seurat, features = unique(markers$gene)) + NoLegend()
 print_img(hm1,
           prefix = prefix,
           title = "heatmap",
           device = device)
+
+loginfo("exporting table of row variances to file")
+write.table(markers,
+            paste0(export_folder, "markers.data.txt"),
+            sep = "\t",
+            row.names = FALSE,
+            col.names = TRUE,
+            quote = FALSE)
 
 saveRDS(seurat, file = paste0(checkpoint_folder, "6-biomarkers.rds"))

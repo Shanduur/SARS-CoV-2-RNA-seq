@@ -32,12 +32,15 @@ print_img(variances,
           title = "variances",
           device = device)
 
+variances <- as.data.frame(variances)
+variances <- data.frame("H"=rownames(variances), variances)
+
 # wektor wariancji eksportujemy (wyliczony ze znormalizowanych danych)
 loginfo("exporting table of row variances to file")
 write.table(variances,
             paste0(export_folder, "variances.data.txt"),
             sep = "\t",
-            row.names = TRUE,
+            row.names = FALSE,
             col.names = TRUE,
             quote = FALSE)
 

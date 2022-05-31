@@ -1,0 +1,3 @@
+[submodule "tools/tably"]
+	path = tools/tably
+	url = https://github.com/narimiran/tably.git

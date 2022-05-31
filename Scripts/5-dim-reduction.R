@@ -64,7 +64,7 @@ print_img(vdl1,
 #           device = device)
 
 loginfo(paste("dim plot - pca"))
-dm1 <- DimPlot(seurat, reduction = "pca")
+dm1 <- DimPlot(seurat, reduction = "pca", group.by = "smoking")
 print_img(dm1,
           prefix = prefix,
           title = "DimPlot-PCA",
@@ -153,7 +153,8 @@ seurat <- RunUMAP(object = seurat, dims = 1:inflection_point)
 loginfo(paste("dim plot - umap"))
 dp1 <- DimPlot(object = seurat,
                reduction = "umap",
-               pt.size = 0.1)
+               pt.size = 0.1,
+               group.by = "smoking")
 print_img(dp1,
           prefix = prefix,
           title = "DimPlot-UMAP",
@@ -167,7 +168,8 @@ seurat <- RunTSNE(object = seurat,
 loginfo(paste("dim plot - tsne"))
 dp1 <- DimPlot(object = seurat,
                reduction = "tsne",
-               pt.size = 0.1)
+               pt.size = 0.1,
+               group.by = "smoking")
 print_img(dp1,
           prefix = prefix,
           title = "DimPlot-TSNE",
