@@ -83,7 +83,8 @@ col_sum_hist <- function(x) {
   hist(colSums(x),
     breaks = 100,
     main = "Expression sum per cell",
-    xlab = "Sum expression"
+    xlab = "Sum expression",
+    ylab = "Number of cells"
   )
 }
 

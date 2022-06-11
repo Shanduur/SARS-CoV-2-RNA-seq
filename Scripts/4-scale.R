@@ -32,22 +32,22 @@ loginfo(paste("number of selected features:", sum(selected)))
 VariableFeatures(seurat) <- rownames(seurat)[selected]
 seurat <- subset(x=seurat, features=rownames(seurat)[selected])
 
-varbarlines <- function(data) {
-  data_sorted <- variances[order(variances$variances),]
-  x = barplot(data_sorted$variances, col = "grey")
-  lines(x = x, y = rep(threshold_log, length(x)), col = "red", lty = 1)
-  lines(x = x, y = rep(mean(data$variances), length(x)), col = "green", lty = 1)
-  lines(x = x, y = rep(median(data$variances), length(x)), col = "blue", lty = 1)
-  legend(1, 5,
-         legend = c(sprintf("mean = %.3f", mean(data$variances)),
-                    sprintf("median = %.3f", median(data$variances)), 
-                    sprintf("threshold = %.3f", threshold_log)),
-         col = c("green", "blue", "red"),
-         lty = rep(1, 3))
-}
+var_mean <- mean(variances$variances)
+var_med <- median(variances$variances)
 
-print_img(variances,
-          fun = varbarlines,
+loginfo(paste("mean of variances =", var_mean))
+loginfo(paste("median of variances =", var_med))
+
+print_img(ggplot(variances, aes(x=variances)) +
+            geom_histogram(bins=100, color="black", fill="grey") +
+            theme_bw() +
+            scale_x_continuous(trans='log2') +
+            geom_vline(xintercept=threshold_log, color = "red") +
+            geom_vline(xintercept=var_mean, color = "green") +
+            geom_vline(xintercept=var_med, color = "blue") +
+            ggtitle("Histogram of annotation scores") +
+            xlab("Variance") +
+            ylab("Number of cells"),
           prefix = prefix,
           title = "variances-selected",
           device = device)

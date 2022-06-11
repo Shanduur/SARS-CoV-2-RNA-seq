@@ -25,9 +25,21 @@ loginfo("calculating variances")
 variances <- rowVars(as.matrix(GetAssayData(object = seurat, slot = "data")),
                          useNames = "TRUE")
 
+my_hist <- function(x,
+                    breaks = 100,
+                    xlab = "Variance",
+                    ylab = "Number of cells",
+                    main = "Histogram of variances") {
+  hist(x,
+       breaks = breaks,
+       main = main,
+       xlab = xlab,
+       ylab = ylab)
+}
+
 loginfo("printing histogram of variances")
 print_img(variances,
-          fun = hist,
+          fun = my_hist,
           prefix = prefix,
           title = "variances",
           device = device)

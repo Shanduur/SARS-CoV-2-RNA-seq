@@ -64,7 +64,10 @@ print_img(vdl1,
 #           device = device)
 
 loginfo(paste("dim plot - pca"))
-dm1 <- DimPlot(seurat, reduction = "pca", group.by = "smoking")
+dm1 <- DimPlot(seurat,
+               reduction = "pca",
+               label.box = TRUE,
+               group.by = "smoking")
 print_img(dm1,
           prefix = prefix,
           title = "DimPlot-PCA",
@@ -97,19 +100,15 @@ print_img(hm2,
           title = "DimHeatmap-1-15",
           device = device)
 
-loginfo("elbow plot")
-elb1 <- ElbowPlot(seurat)
-print_img(elb1,
-          prefix = prefix,
-          title = "ElbowPlot",
-          device = device)
-
 dist2d <- function(a,b,c) {
   v1 <- b - c
   v2 <- a - b
   m <- cbind(v1,v2)
   d <- abs(det(m))/sqrt(sum(v1*v1))
 }
+
+loginfo("elbow plot")
+elb1 <- ElbowPlot(seurat)
 
 distances <- c()
 for (i in 1:length(elb1$data$dims)) {
@@ -121,6 +120,12 @@ for (i in 1:length(elb1$data$dims)) {
 }
 
 inflection_point <- match(max(distances), distances)
+loginfo(paste("inflection point is equal to", inflection_point))
+
+print_img(elb1 + geom_vline(xintercept = inflection_point, color = "red"),
+          prefix = prefix,
+          title = "ElbowPlot",
+          device = device)
 
 # # Determine the ‘dimensionality’ of the dataset
 # seurat <- JackStraw(seurat, num.replicate = 100)
@@ -153,6 +158,7 @@ seurat <- RunUMAP(object = seurat, dims = 1:inflection_point)
 loginfo(paste("dim plot - umap"))
 dp1 <- DimPlot(object = seurat,
                reduction = "umap",
+               label.box = TRUE,
                pt.size = 0.1,
                group.by = "smoking")
 print_img(dp1,
@@ -169,6 +175,7 @@ loginfo(paste("dim plot - tsne"))
 dp1 <- DimPlot(object = seurat,
                reduction = "tsne",
                pt.size = 0.1,
+               label.box = TRUE,
                group.by = "smoking")
 print_img(dp1,
           prefix = prefix,

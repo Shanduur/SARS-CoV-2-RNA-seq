@@ -101,6 +101,10 @@ seurat@meta.data$orig.ident <- NULL
 seurat@meta.data$smoking <- mapvalues(seurat@meta.data$smoking, c(-1, 0, 1), c("unknown", "non-smokers", "smokers"))
 Idents(seurat) <- seurat@meta.data$smoking
 
+seurat@meta.data$status <- mapvalues(seurat@meta.data$id_new,
+                                     c("C-1", "C-2", "C-3", "C-4", "COV-1", "COV-2", "COV-3", "COV-4", "COV-5", "COV-8"),
+                                     c("control", "control", "control", "control", "COVID", "COVID", "COVID", "COVID", "COVID", "COVID"))
+
 seurat[["percent.mt"]] <- PercentageFeatureSet(seurat, pattern = "^MT-")
 seurat[["percent.rb"]] <- PercentageFeatureSet(seurat, pattern = "^RB-")
 head(seurat[["percent.mt"]], n = 20)
@@ -197,6 +201,8 @@ print_img(plot3 +
 loginfo(paste("Feature stats:", feature_min, feature_m, feature_max, feature_s))
 loginfo(paste("UMI stats:", count_min, count_m, count_max, count_s, count_q))
 seurat <- subset(seurat, subset = nFeature_RNA > 500 & nCount_RNA < count_q & percent.mt < 5 & smoking != "unknown")
+
+unique(paste(seurat@meta.data$id_new, seurat@meta.data$smoking))
 
 saveRDS(seurat, file = paste0(checkpoint_folder, "2-loaded.rds"))
 # rm(seurat_list)

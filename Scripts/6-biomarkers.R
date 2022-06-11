@@ -25,6 +25,7 @@ loginfo(paste("dim plot - umap"))
 dp1 <- DimPlot(object = seurat,
               reduction = "umap",
               split.by = "smoking",
+              label.box = TRUE,
               pt.size = 0.1)
 print_img(dp1,
           prefix = prefix,
@@ -37,6 +38,7 @@ loginfo(paste("dim plot - tsne"))
 dp2 <- DimPlot(object = seurat,
               reduction = "tsne",
               split.by = "smoking",
+              label.box = TRUE,
               pt.size = 0.1)
 print_img(dp2,
           prefix = prefix,
@@ -49,6 +51,7 @@ loginfo(paste("dim plot - pca"))
 dp3 <- DimPlot(object = seurat,
               reduction = "pca",
               split.by = "smoking",
+              label.box = TRUE,
               pt.size = 0.1)
 print_img(dp3,
           prefix = prefix,
@@ -88,9 +91,10 @@ seurat_markers <- FindAllMarkers(seurat,
 )
 markers <- (seurat_markers %>%
               group_by(cluster) %>%
-              slice_max(n = 2, order_by = avg_log2FC))
+              slice_max(n = 2, order_by = le))
 
 head(seurat_markers, n = 5)
+length(seurat_markers)
 
 print(seurat[["pca"]], dims = 1:5, nfeatures = 5)
 
@@ -111,14 +115,15 @@ vln2 <- VlnPlot(seurat,
         features = unique(markers$gene),
         slot = "counts",
         log = TRUE,
-        split.by = "smoking"
+        split.by = "smoking",
+        ncol = 2
         )
 print_img(vln2,
           prefix = prefix,
           title = "violin-2",
           device = device,
-          width = 25,
-          height = 18
+          width = 18,
+          height = 25
           )
 
 loginfo(paste("feature plots - 1"))

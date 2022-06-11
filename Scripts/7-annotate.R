@@ -9,11 +9,16 @@ if (!require("Seurat")) {
   library(Seurat)
 }
 
+if (!require("plyr")) {
+  install.packages("plyr")
+  library(plyr)
+}
+
 if (!require("BiocManager")) {
   install.packages("BiocManager")
 }
 
-BiocManager::insestall("SingleR")
+BiocManager::install("SingleR", update = FALSE, ask = FALSE)
 
 if (!require("remotes")) {
   install.packages("remotes")
@@ -42,7 +47,10 @@ replace <- Vectorize(function(x) {
 
 for (level in annotationLevels) {
   loginfo(paste("predicted Azimuth annotations on dim plot for", level))
-  dpann <- DimPlot(seurat, group.by = level, label = TRUE, label.size = 3, split.by = "smoking") + NoLegend()
+  dpann <- DimPlot(seurat,
+                   group.by = level,
+                   split.by = "smoking")
+  dpann <- LabelClusters(plot = dpann, id = level, color = "black", box = TRUE)
   print_img(dpann,
             prefix = prefix,
             title = paste0("dim_plot", level, sep = "-"),
@@ -50,10 +58,27 @@ for (level in annotationLevels) {
 
   
   loginfo(paste("predicted Azimuth annotation scores", level))
-  vlnScore <- VlnPlot(seurat, split.by = "smoking", features = paste0(level, ".score")) + NoLegend()
+  vlnScore <- VlnPlot(seurat,
+                      split.by = "smoking",
+                      group.by = level,
+                      features = paste0(level, ".score"))
   print_img(vlnScore,
             prefix = prefix,
             title = paste0("vln_plt_score", level, sep = "-"),
+            device = device)
+ 
+  df = as.data.frame(FetchData(seurat, paste0(level, ".score"))[[1]])
+  colnames(df) = c('score')
+  loginfo(paste("predicted Azimuth annotation scores on histogram", level)) 
+  print_img(ggplot(df, aes(x=score)) +
+              geom_histogram(bins=10, color="black", fill="grey") +
+              theme_bw() +
+              scale_y_continuous(trans='log10') +
+              ggtitle("Histogram of annotation scores") +
+              xlab("Annotation score") +
+              ylab("Number of cells"),
+            prefix = prefix,
+            title = paste0("histogram-score", level, sep = "-"),
             device = device)
 }
 
@@ -67,13 +92,30 @@ loginfo("creating non-smokers object")
 non_smokers_cells <- rownames(seurat@meta.data)[seurat@meta.data$smoking == "non-smokers"]
 seurat_non_smokers <- seurat[,colnames(seurat) %in% non_smokers_cells]
 
-genes_more_expr_smokers <- rowSums(seurat_smokers@assays$RNA@data) > rowSums(seurat_non_smokers@assays$RNA@data)
+genes_more_expr_smokers <- rowMeans(seurat_smokers@assays$RNA@data) > rowMeans(seurat_non_smokers@assays$RNA@data)
 genes_more_expr_smokers_cnt <- sum(genes_more_expr_smokers)
 genes_more_expr_smokers_names <- rownames(seurat)[genes_more_expr_smokers]
 
-genes_less_expr_smokers <- rowSums(seurat_smokers@assays$RNA@data) < rowSums(seurat_non_smokers@assays$RNA@data)
+genes_less_expr_smokers <- rowMeans(seurat_smokers@assays$RNA@data) < rowMeans(seurat_non_smokers@assays$RNA@data)
 genes_less_expr_smokers_cnt <- sum(genes_less_expr_smokers)
 genes_less_expr_smokers_names <- rownames(seurat)[genes_less_expr_smokers]
+
+expression_diff <- rowMeans(seurat_smokers@assays$RNA@data) - rowMeans(seurat_non_smokers@assays$RNA@data)
+
+ted <- tail(sort(expression_diff))
+ted <- as.data.frame(ted)
+ted$ted <- abs(ted$ted)
+hed <- head(sort(expression_diff))
+hed <- as.data.frame(hed)
+hed$hed <- abs(hed$hed)
+print(ted)
+print(hed)
+
+thed_genes <- unique(c(rownames(ted), rownames(hed)))
+
+expression_diff_df <- as.data.frame(expression_diff)
+markers_diff <- as.data.frame(expression_diff_df[unique(markers$gene),])
+rownames(markers_diff) <- unique(markers$gene)
 
 for (level in annotationLevels) {
   annotationFile <- paste0("./Data/Azimuth/Azimuth_Lung_Annotations_-_Level_", level , ".csv")
@@ -160,15 +202,55 @@ print_img(vln_P + vln_A,
           device = device)
 
 loginfo("dim plot comparing two groups: cell annotations vs predicted annotations")
-dp_P <- DimPlot(seurat,
-                 group.by = c("predicted.ann_finest_level", "cluster"),
-                 label = TRUE,
-                 label.size = 3,
-                 split.by = "smoking")
-print_img(dp_P,
+dp_P_1 <- DimPlot(seurat,
+                group.by = "predicted.ann_finest_level",
+                split.by = "smoking")
+dp_P_1 <- LabelClusters(plot = dp_P_1, id = "predicted.ann_finest_level", color = "black", box = TRUE, size = 2)
+dp_P_2 <- DimPlot(seurat,
+                  group.by = "cluster",
+                  split.by = "smoking")
+dp_P_2 <- LabelClusters(plot = dp_P_2, id = "cluster", color = "black", box = TRUE, size = 2)
+print_img(dp_P_1 + dp_P_2,
           height = 11,
           prefix = prefix,
           title = "dim_plot_predicted_clusters",
+          device = device)
+
+pred_anno <- unique(seurat@meta.data$predicted.ann_finest_level)
+clus_anno <- unique(seurat@meta.data$cluster)
+
+df <- data.frame(matrix(NA,
+                        nrow = 0,
+                        ncol = 3))
+colnames(df) <- c("Annotated", "Predicted", "count")
+
+for (i in clus_anno) {
+  for (j in pred_anno) {
+    count <- sum(seurat@meta.data$cluster == i & seurat@meta.data$predicted.ann_finest_level == j)
+    df[nrow(df) +1,] <- c(
+      i,
+      j,
+      count
+    )
+  }
+}
+df$count <- as.integer(df$count)
+
+lut <- ggplot(df, aes(x = Predicted, y = Annotated, fill = count)) +
+  geom_tile(color = "black") +
+  geom_text(aes(label = count), color = "black", size = 12) +
+  theme(text = element_text(size=40),
+        legend.title = element_text(size=24),
+        legend.text = element_text(size=24),
+        axis.text.x = element_text(angle=45, hjust=1, size = 24),
+        axis.text.y = element_text(hjust=1, size = 24)) +
+  scale_fill_gradient(low="aliceblue", high="yellow") +
+  coord_fixed()
+print_img(lut,
+          width = 20,
+          height = 22,
+          prefix = prefix,
+          title = "look_up_table",
           device = device)
 
 dotplt1 <- DotPlot(seurat_smokers,
@@ -210,26 +292,387 @@ print_img(dotplt,
           title = "dot_plot",
           device = device)
 
+loginfo("DotPlot 2")
+dotplt2 <- DotPlot(seurat,
+                   features = thed_genes,
+                   group.by= "predicted.ann_finest_level",
+                   # split.by = "smoking",
+                   dot.scale = 16) +
+  RotatedAxis() +
+  labs(y="Class", x = "Genes") +
+  theme(axis.text = element_text(size=20)) +
+  scale_y_discrete(labels = replace) +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_line(colour = "gray",
+                                        linetype = "dashed", size=0.35),
+        panel.border = element_rect(colour = "black", fill=NA, size=2)) +
+  facet_grid(~ unique(seurat@meta.data$smoking)) +
+  theme(strip.text = element_text(size = 30))
+print_img(dotplt2,
+          width = 22,
+          height = 16,
+          prefix = prefix,
+          title = "dot_plot_2",
+          device = device)
+
+loginfo("creating covid object")
+covid_cells <- rownames(seurat@meta.data)[seurat@meta.data$status == "COVID"]
+seurat_covid <- seurat[,colnames(seurat) %in% covid_cells]
+
+loginfo("creating control object")
+control_cells <- rownames(seurat@meta.data)[seurat@meta.data$status == "control"]
+seurat_control <- seurat[,colnames(seurat) %in% control_cells]
+
+seurat_covid_means <- rowMeans(seurat_covid)
+seurat_control_means <- rowMeans(seurat_control)
+
+scmd <- data.frame(genes = rownames(as.data.frame(seurat_covid_means)),
+                   avg.covid = as.vector(seurat_covid_means),
+                   avg.cntrl = as.vector(seurat_control_means)
+)
+
+loginfo("DotPlot 3")
+dotplt3 <- DotPlot(seurat,
+                   features = thed_genes,
+                   group.by= "predicted.ann_finest_level",
+                   # split.by = "smoking",
+                   dot.scale = 16) +
+  RotatedAxis() +
+  labs(y="Class", x = "Genes") +
+  theme(axis.text = element_text(size=20)) +
+  scale_y_discrete(labels = replace) +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_line(colour = "gray",
+                                        linetype = "dashed", size=0.35),
+        panel.border = element_rect(colour = "black", fill=NA, size=2)) +
+  facet_grid(~ unique(seurat@meta.data$status)) +
+  theme(strip.text = element_text(size = 30))
+print_img(dotplt3,
+          width = 22,
+          height = 16,
+          prefix = prefix,
+          title = "dot_plot_3",
+          device = device)
+
+# ------------------------------------------------------------------------------
+
 loginfo(paste("violin plot"))
 vln <- VlnPlot(seurat,
-                features = unique(markers$gene),
-                group.by = "predicted.ann_finest_level",
-                slot = "counts",
-                log = TRUE,
-                split.by = "smoking"
+              features = unique(markers$gene)[1:8],
+              group.by = "predicted.ann_finest_level",
+              slot = "counts",
+              log = TRUE,
+              ncol = 2,
+              split.by = "smoking"
 )
 print_img(vln,
           prefix = prefix,
           title = "violin",
           device = device,
-          width = 25,
-          height = 18
+          width = 18,
+          height = 25
 )
 
-hm1 <- DoHeatmap(seurat, features = unique(markers$gene)) + NoLegend()
+loginfo(paste("violin plot cont"))
+vln_cont <- VlnPlot(seurat,
+                    features = unique(markers$gene)[9:length(unique(markers$gene))],
+                    group.by = "predicted.ann_finest_level",
+                    slot = "counts",
+                    log = TRUE,
+                    ncol = 2,
+                    split.by = "smoking"
+)
+print_img(vln_cont,
+          prefix = prefix,
+          title = "violin-cont",
+          device = device,
+          width = 18,
+          height = 25
+)
+
+# ------------------------------------------------------------------------------
+
+loginfo(paste("violin plot 2"))
+vln2 <- VlnPlot(seurat,
+                features = unique(markers$gene)[1:8],
+                group.by = "cluster",
+                slot = "counts",
+                log = TRUE,
+                ncol = 2,
+                split.by = "smoking"
+)
+print_img(vln2,
+          prefix = prefix,
+          title = "violin-2",
+          device = device,
+          width = 18,
+          height = 25
+)
+
+loginfo(paste("violin plot 2 cont"))
+vln2_cont <- VlnPlot(seurat,
+                     features = unique(markers$gene)[9:length(unique(markers$gene))],
+                     group.by = "cluster",
+                     slot = "counts",
+                     log = TRUE,
+                     ncol = 2,
+                     split.by = "smoking"
+)
+print_img(vln2_cont,
+          prefix = prefix,
+          title = "violin-2-cont",
+          device = device,
+          width = 18,
+          height = 25
+)
+
+# ------------------------------------------------------------------------------
+
+loginfo(paste("violin plot 3"))
+vln3 <- VlnPlot(seurat,
+                features = thed_genes[1:8],
+                group.by = "cluster",
+                slot = "counts",
+                log = TRUE,
+                ncol = 2,
+                split.by = "smoking"
+)
+print_img(vln3,
+          prefix = prefix,
+          title = "violin-3",
+          device = device,
+          width = 18,
+          height = 25
+)
+
+loginfo(paste("violin plot 3 cont"))
+vln3_cont <- VlnPlot(seurat,
+                     features = thed_genes[9:length(thed_genes)],
+                     group.by = "cluster",
+                     slot = "counts",
+                     log = TRUE,
+                     ncol = 2,
+                     split.by = "smoking"
+)
+print_img(vln3_cont,
+          prefix = prefix,
+          title = "violin-3-cont",
+          device = device,
+          width = 18,
+          height = 13
+)
+
+# ------------------------------------------------------------------------------
+
+loginfo(paste("violin plot 4"))
+vln4 <- VlnPlot(seurat,
+                features = thed_genes[1:8],
+                group.by = "predicted.ann_finest_level",
+                slot = "counts",
+                log = TRUE,
+                ncol = 2,
+                split.by = "smoking"
+)
+print_img(vln4,
+          prefix = prefix,
+          title = "violin-4",
+          device = device,
+          width = 18,
+          height = 25
+)
+
+loginfo(paste("violin plot 4 cont"))
+vln4_cont <- VlnPlot(seurat,
+                     features = thed_genes[9:length(thed_genes)],
+                     group.by = "predicted.ann_finest_level",
+                     slot = "counts",
+                     log = TRUE,
+                     ncol = 2,
+                     split.by = "smoking"
+)
+print_img(vln4_cont,
+          prefix = prefix,
+          title = "violin-4-cont",
+          device = device,
+          width = 18,
+          height = 13
+)
+
+# ------------------------------------------------------------------------------
+
+loginfo(paste("ridge plot"))
+rdg <- RidgePlot(seurat,
+                features = unique(markers$gene)[1:8],
+                group.by = "predicted.ann_finest_level",
+                slot = "counts",
+                log = TRUE,
+                ncol = 2
+)
+print_img(rdg,
+          prefix = prefix,
+          title = "ridge",
+          device = device,
+          width = 18,
+          height = 25
+)
+
+
+loginfo(paste("ridge plot cont"))
+rdg_cont <- RidgePlot(seurat,
+                      features = unique(markers$gene)[9:length(unique(markers$gene))],
+                      group.by = "predicted.ann_finest_level",
+                      slot = "counts",
+                      log = TRUE,
+                      ncol = 2
+)
+print_img(rdg_cont,
+          prefix = prefix,
+          title = "ridge-cont",
+          device = device,
+          width = 18,
+          height = 25
+)
+
+# ------------------------------------------------------------------------------
+
+loginfo(paste("ridge plot 2"))
+rdg2 <- RidgePlot(seurat,
+                  features = unique(markers$gene)[1:8],
+                  group.by = "cluster",
+                  slot = "counts",
+                  log = TRUE,
+                  ncol = 2
+)
+print_img(rdg2,
+          prefix = prefix,
+          title = "ridge-2",
+          device = device,
+          width = 18,
+          height = 25
+)
+
+loginfo(paste("ridge plot 2 cont"))
+rdg2_cont <- RidgePlot(seurat,
+                       features = unique(markers$gene)[9:length(unique(markers$gene))],
+                       group.by = "cluster",
+                       slot = "counts",
+                       log = TRUE,
+                       ncol = 2
+)
+print_img(rdg2_cont,
+          prefix = prefix,
+          title = "ridge-2-cont",
+          device = device,
+          width = 18,
+          height = 25
+)
+
+
+# ------------------------------------------------------------------------------
+
+loginfo(paste("ridge plot 3"))
+rdg3 <- RidgePlot(seurat,
+                  features = thed_genes[1:8],
+                  group.by = "cluster",
+                  slot = "counts",
+                  log = TRUE,
+                  ncol = 2
+)
+print_img(rdg3,
+          prefix = prefix,
+          title = "ridge-3",
+          device = device,
+          width = 18,
+          height = 25
+)
+
+loginfo(paste("ridge plot 3 cont"))
+rdg3_cont <- RidgePlot(seurat,
+                       features = thed_genes[9:length(thed_genes)],
+                       group.by = "cluster",
+                       slot = "counts",
+                       log = TRUE,
+                       ncol = 2
+)
+print_img(rdg3_cont,
+          prefix = prefix,
+          title = "ridge-3-cont",
+          device = device,
+          width = 18,
+          height = 13
+)
+
+# ------------------------------------------------------------------------------
+
+loginfo(paste("ridge plot 4"))
+rdg4 <- RidgePlot(seurat,
+                  features = thed_genes[1:8],
+                  group.by = "predicted.ann_finest_level",
+                  slot = "counts",
+                  log = TRUE,
+                  ncol = 2
+)
+print_img(rdg4,
+          prefix = prefix,
+          title = "ridge-4",
+          device = device,
+          width = 18,
+          height = 25
+)
+
+loginfo(paste("ridge plot 4"))
+rdg4_cont <- RidgePlot(seurat,
+                       features = thed_genes[9:length(thed_genes)],
+                       group.by = "predicted.ann_finest_level",
+                       slot = "counts",
+                       log = TRUE,
+                       ncol = 2
+)
+print_img(rdg4_cont,
+          prefix = prefix,
+          title = "ridge-4-cont",
+          device = device,
+          width = 18,
+          height = 13
+)
+
+# ------------------------------------------------------------------------------
+
+hm1 <- DoHeatmap(seurat, features = unique(markers$gene))
 print_img(hm1,
           prefix = prefix,
           title = "heatmap",
           device = device)
+
+hm2 <- DoHeatmap(seurat, features = thed_genes, 
+                 raster = FALSE, group.by = "smoking")
+print_img(hm2,
+          prefix = prefix,
+          title = "heatmap_2",
+          device = device)
+
+covid_sns_all <- c("ACE2", "TMPRSS2", "IL6R", "IL6ST", "PCSK1", "IL6", "PCSK2", "CTSE", "MYRF", "MAG", "MOG", "MBP", "PLP1", "FURIN", "PCSK4", "PCSK5", "PCSK6", "PCSK7", "C1R", "C2", "C3", "C5", "CFI", "CTSS", "CTSL", "CTSB", "CTSC")
+covid_sns <- intersect(rownames(seurat), covid_sns_all)
+
+loginfo(paste("covid sns all genes:", length(covid_sns_all)))
+loginfo(paste("covid sns expressed genes:", length(covid_sns)))
+loginfo(paste("covid sns and thed genes:", length(intersect(thed_genes, covid_sns))))
+
+loginfo(paste("violin plot 5"))
+vln5 <- VlnPlot(seurat,
+                features = covid_sns,
+                group.by = "predicted.ann_finest_level",
+                slot = "counts",
+                log = TRUE,
+                ncol = 2,
+                split.by = "smoking"
+)
+print_img(vln5,
+          prefix = prefix,
+          title = "violin-5",
+          device = device,
+          width = 18,
+          height = 18
+)
 
 saveRDS(seurat, file = paste0(checkpoint_folder, "7-annotate.rds"))
