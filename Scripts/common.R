@@ -94,6 +94,8 @@ print_img <- function(x,
                       height = 8,
                       title = NULL,
                       device = NULL,
+                      pointsize = 12,
+                      res = 200,
                       prefix = "00",
                       output_folder = "./Data/Output/") {
   env_rmote <- FALSE
@@ -119,13 +121,20 @@ print_img <- function(x,
       graphics_device <- pdf
     } else if (device == "jpeg") {
       graphics_device <- jpeg
+      width <- width * 200
+      height <- height * 200
     } else if (device == "png") {
       graphics_device <- png
+      width <- width * 200
+      height <- height * 200
     }
 
     graphics_device(file = file.path(output_folder, paste0(prefix, "-", title, ".", device)),
           width = width,
-          height = height)
+          height = height,
+          pointsize = pointsize,
+          res = res,
+          quality = 50)
   }
 
   if (is.null(fun)) {

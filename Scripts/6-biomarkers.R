@@ -1,7 +1,7 @@
 source("./Scripts/common.R")
 
 prefix <- "06"
-device <- "pdf"
+device <- "jpeg"
 # device <- NULL
 
 if (!require("Seurat")) {
@@ -122,8 +122,9 @@ print_img(vln2,
           prefix = prefix,
           title = "violin-2",
           device = device,
-          width = 18,
-          height = 25
+          width = 9,
+          height = 12,
+          res = 100,
           )
 
 loginfo(paste("feature plots - 1"))
@@ -148,6 +149,9 @@ hm1 <- DoHeatmap(seurat, features = unique(markers$gene)) + NoLegend()
 print_img(hm1,
           prefix = prefix,
           title = "heatmap",
+          width = 6,
+          height = 4,
+          res = 100,
           device = device)
 
 loginfo("exporting table of row variances to file")

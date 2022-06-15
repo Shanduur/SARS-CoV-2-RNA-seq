@@ -1,7 +1,7 @@
 source("./Scripts/common.R")
 
 prefix <- "07"
-device <- "pdf"
+device <- "jpeg"
 # device <- NULL
 
 if (!require("Seurat")) {
@@ -65,7 +65,8 @@ for (level in annotationLevels) {
   print_img(vlnScore,
             prefix = prefix,
             title = paste0("vln_plt_score", level, sep = "-"),
-            device = device)
+            device = device,
+            res = 200)
  
   df = as.data.frame(FetchData(seurat, paste0(level, ".score"))[[1]])
   colnames(df) = c('score')
@@ -148,7 +149,8 @@ for (level in annotationLevels) {
       print_img(vpl,
                 prefix = paste(level, id, prefix, sep = "/"),
                 title = paste0("violin_plot", level, id, i, sep = "-"),
-                device = device)
+                device = device,
+                res = 200)
 
       loginfo(paste("Feature plot for [", paste(intersection, collapse = ", "), "]"))
       fpl <- FeaturePlot(seurat,
@@ -199,7 +201,8 @@ print_img(vln_P + vln_A,
           height = 11,
           prefix = prefix,
           title = "violin_predicted_clusters",
-          device = device)
+          device = device,
+          res = 200)
 
 loginfo("dim plot comparing two groups: cell annotations vs predicted annotations")
 dp_P_1 <- DimPlot(seurat,
@@ -247,8 +250,9 @@ lut <- ggplot(df, aes(x = Predicted, y = Annotated, fill = count)) +
   scale_fill_gradient(low="aliceblue", high="yellow") +
   coord_fixed()
 print_img(lut,
-          width = 20,
-          height = 22,
+          width = 10,
+          height = 11,
+          res = 100,
           prefix = prefix,
           title = "look_up_table",
           device = device)
@@ -286,8 +290,9 @@ dotplt <- DotPlot(seurat,
   facet_grid(~ unique(seurat@meta.data$smoking)) +
   theme(strip.text = element_text(size = 30))
 print_img(dotplt,
-          width = 22,
-          height = 16,
+          width = 11,
+          height = 8,
+          res = 100,
           prefix = prefix,
           title = "dot_plot",
           device = device)
@@ -309,8 +314,9 @@ dotplt2 <- DotPlot(seurat,
   facet_grid(~ unique(seurat@meta.data$smoking)) +
   theme(strip.text = element_text(size = 30))
 print_img(dotplt2,
-          width = 22,
-          height = 16,
+          width = 11,
+          height = 8,
+          res = 100,
           prefix = prefix,
           title = "dot_plot_2",
           device = device)
@@ -348,8 +354,9 @@ dotplt3 <- DotPlot(seurat,
   facet_grid(~ unique(seurat@meta.data$status)) +
   theme(strip.text = element_text(size = 30))
 print_img(dotplt3,
-          width = 22,
-          height = 16,
+          width = 11,
+          height = 8,
+          res = 100,
           prefix = prefix,
           title = "dot_plot_3",
           device = device)
@@ -369,8 +376,9 @@ print_img(vln,
           prefix = prefix,
           title = "violin",
           device = device,
-          width = 18,
-          height = 25
+          width = 9,
+          height = 12,
+          res = 100
 )
 
 loginfo(paste("violin plot cont"))
@@ -386,8 +394,9 @@ print_img(vln_cont,
           prefix = prefix,
           title = "violin-cont",
           device = device,
-          width = 18,
-          height = 25
+          width = 9,
+          height = 12,
+          res = 100
 )
 
 # ------------------------------------------------------------------------------
@@ -405,8 +414,9 @@ print_img(vln2,
           prefix = prefix,
           title = "violin-2",
           device = device,
-          width = 18,
-          height = 25
+          width = 9,
+          height = 12,
+          res = 100
 )
 
 loginfo(paste("violin plot 2 cont"))
@@ -422,8 +432,9 @@ print_img(vln2_cont,
           prefix = prefix,
           title = "violin-2-cont",
           device = device,
-          width = 18,
-          height = 25
+          width = 9,
+          height = 12,
+          res = 100
 )
 
 # ------------------------------------------------------------------------------
@@ -441,8 +452,9 @@ print_img(vln3,
           prefix = prefix,
           title = "violin-3",
           device = device,
-          width = 18,
-          height = 25
+          width = 9,
+          height = 12,
+          res = 100
 )
 
 loginfo(paste("violin plot 3 cont"))
@@ -458,8 +470,9 @@ print_img(vln3_cont,
           prefix = prefix,
           title = "violin-3-cont",
           device = device,
-          width = 18,
-          height = 13
+          width = 9,
+          height = 6,
+          res = 100
 )
 
 # ------------------------------------------------------------------------------
@@ -477,8 +490,9 @@ print_img(vln4,
           prefix = prefix,
           title = "violin-4",
           device = device,
-          width = 18,
-          height = 25
+          width = 9,
+          height = 12,
+          res = 100
 )
 
 loginfo(paste("violin plot 4 cont"))
@@ -494,8 +508,9 @@ print_img(vln4_cont,
           prefix = prefix,
           title = "violin-4-cont",
           device = device,
-          width = 18,
-          height = 13
+          width = 9,
+          height = 6,
+          res = 100
 )
 
 # ------------------------------------------------------------------------------
@@ -512,8 +527,9 @@ print_img(rdg,
           prefix = prefix,
           title = "ridge",
           device = device,
-          width = 18,
-          height = 25
+          width = 9,
+          height = 12,
+          res = 100
 )
 
 
@@ -529,8 +545,9 @@ print_img(rdg_cont,
           prefix = prefix,
           title = "ridge-cont",
           device = device,
-          width = 18,
-          height = 25
+          width = 9,
+          height = 12,
+          res = 100
 )
 
 # ------------------------------------------------------------------------------
@@ -547,8 +564,9 @@ print_img(rdg2,
           prefix = prefix,
           title = "ridge-2",
           device = device,
-          width = 18,
-          height = 25
+          width = 9,
+          height = 12,
+          res = 100
 )
 
 loginfo(paste("ridge plot 2 cont"))
@@ -563,8 +581,9 @@ print_img(rdg2_cont,
           prefix = prefix,
           title = "ridge-2-cont",
           device = device,
-          width = 18,
-          height = 25
+          width = 9,
+          height = 12,
+          res = 100
 )
 
 
@@ -582,8 +601,9 @@ print_img(rdg3,
           prefix = prefix,
           title = "ridge-3",
           device = device,
-          width = 18,
-          height = 25
+          width = 9,
+          height = 12,
+          res = 100
 )
 
 loginfo(paste("ridge plot 3 cont"))
@@ -598,8 +618,9 @@ print_img(rdg3_cont,
           prefix = prefix,
           title = "ridge-3-cont",
           device = device,
-          width = 18,
-          height = 13
+          width = 9,
+          height = 6,
+          res = 100
 )
 
 # ------------------------------------------------------------------------------
@@ -616,8 +637,9 @@ print_img(rdg4,
           prefix = prefix,
           title = "ridge-4",
           device = device,
-          width = 18,
-          height = 25
+          width = 9,
+          height = 12,
+          res = 100
 )
 
 loginfo(paste("ridge plot 4"))
@@ -632,8 +654,9 @@ print_img(rdg4_cont,
           prefix = prefix,
           title = "ridge-4-cont",
           device = device,
-          width = 18,
-          height = 13
+          width = 9,
+          height = 6,
+          res = 100
 )
 
 # ------------------------------------------------------------------------------
@@ -671,8 +694,9 @@ print_img(vln5,
           prefix = prefix,
           title = "violin-5",
           device = device,
-          width = 18,
-          height = 18
+          res = 100,
+          width = 9,
+          height = 9
 )
 
 saveRDS(seurat, file = paste0(checkpoint_folder, "7-annotate.rds"))

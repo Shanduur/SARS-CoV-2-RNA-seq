@@ -1,7 +1,7 @@
 source("./Scripts/common.R")
 
 prefix <- "05"
-device <- "pdf"
+device <- "jpeg"
 # device <- NULL
 
 if (!require("Seurat")) {

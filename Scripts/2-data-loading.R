@@ -1,7 +1,7 @@
 source("./Scripts/common.R")
 
 prefix <- "02"
-device <- "pdf"
+device <- "jpeg"
 # device <- NULL
 
 if (!require("Seurat")) {
@@ -148,7 +148,8 @@ vln1 <- VlnPlot(seurat,
 print_img(vln1,
           prefix = prefix,
           title = "violin-qc-metrics-1",
-          device = device)
+          device = device,
+          res = 200)
 
 loginfo(paste("violin plot 2"))
 vln2 <- VlnPlot(seurat,
